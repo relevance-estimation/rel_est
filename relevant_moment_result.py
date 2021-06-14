@@ -62,8 +62,8 @@ class RelevantMomentResult(QWidget):
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        self.table.verticalHeader().setStretchLastSection(True)
-        self.table.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        #self.table.verticalHeader().setStretchLastSection(True)
+        #self.table.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 

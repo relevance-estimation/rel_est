@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication,QLabel,QFileDi
 
 signal_state = False
 
-
 class App(QMainWindow):
     def __init__(self):
         super().__init__()

@@ -104,13 +104,6 @@ class AdEditPage1(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    def showDialog(self):
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
-        f = open(fname, 'r')
-        with f:
-            data = f.read()
-            self.textEdit.setText(data)
-
 
 def getOpenFilesAndDirs(parent=None, caption='', directory='',
                         filter='', initialFilter='', options=None):

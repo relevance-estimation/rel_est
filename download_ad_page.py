@@ -76,19 +76,37 @@ class DownloadAdPage(QWidget):
 
         self.pageTitleLabel.setAlignment(Qt.AlignCenter)
 
+        self.buttonsHbox = QHBoxLayout()
+        self.buttonsHbox.setAlignment(Qt.AlignLeft)
+        self.buttonsHbox.setContentsMargins(0, 0, 0, 0)
+        self.saveVideosToButton = QPushButton("Сохран. видео")
+        self.savePathLabel = QLabel("")
+        self.savePathLabel.setMaximumWidth(300)
+
+        self.buttonsHbox.addWidget(self.saveVideosToButton)
+        self.buttonsHbox.addWidget(self.savePathLabel)
+
+        self.analysisHbox = QHBoxLayout()
+        self.analysisHbox.setAlignment(Qt.AlignLeft)
+        self.analysisHbox.setContentsMargins(0, 0, 0, 0)
         self.pageDownloadButton = QPushButton("Анализ")
         self.pageDownloadInfo = QLabel("")
+        self.pageDownloadInfo.setMaximumWidth(300)
+
+        self.analysisHbox.addWidget(self.pageDownloadButton)
+        self.analysisHbox.addWidget(self.pageDownloadInfo)
 
         self.pageVbox = QVBoxLayout()
         self.pageVbox.addWidget(self.pageTitleLabel)
         self.pageVbox.addLayout(self.pageHbox)
-        self.pageVbox.addWidget(self.pageDownloadButton)
-        self.pageVbox.addWidget(self.pageDownloadInfo)
+        self.pageVbox.addLayout(self.buttonsHbox)
+        self.pageVbox.addLayout(self.analysisHbox)
 
         self.setLayout(self.pageVbox)
 
         self.setStyleSheet("""
             QPushButton {
+                min-width: 80px;
                 max-width: 80px;
             }
         """)

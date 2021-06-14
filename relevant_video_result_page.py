@@ -4,7 +4,7 @@
 import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
                             QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QListWidget, QTableWidget,
-                            QHeaderView)
+                            QHeaderView, QTableWidgetItem)
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QFont
 
@@ -58,7 +58,7 @@ class RelevantVideoResultPage(QWidget):
         self.table.setColumnCount(4)
         self.table.setRowCount(10)
 
-        self.table.setHorizontalHeaderLabels(["Путь к файлу", "Фрагмент", "Тип релевантности", "Оценка релевантности"])
+        self.table.setHorizontalHeaderLabels(["Имя файла", "Фрагмент", "Тип релевантности", "Оценка релевантности"])
 
         self.table.resizeColumnsToContents()
 
@@ -69,6 +69,7 @@ class RelevantVideoResultPage(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+
 
         self.table.showGrid()
 

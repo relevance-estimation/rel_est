@@ -38,7 +38,7 @@ class RelevantVideo(QWidget):
         #self.adEditBlock.setMaximumSize(500, 250)
 
 
-        self.namewindow=QLabel('<h1>Релевантное видео</h1>')
+        self.namewindow=QLabel('<h1>Релевантные видео</h1>')
         self.namewindow.setAlignment(Qt.AlignCenter)
 
         #self.namewindow.setFixedHeight()

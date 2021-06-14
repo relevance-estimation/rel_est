@@ -42,6 +42,7 @@ class AdEditPage1(QWidget):
         self.pathEdit = QLineEdit()
         self.buttonEdit= QPushButton('Редактировать', self)
 
+        self.pathEdit.setReadOnly(True)
 
         self.buttonEdit.setMaximumWidth(100)
         self.buttonoverview.setMaximumWidth(100)
@@ -65,12 +66,6 @@ class AdEditPage1(QWidget):
         grid.addWidget(self.buttonEdit, 2 , 2)
 
 
-        if signal_state:
-            self.buttonEdit.setEnabled(True)
-            #if buttonEdit.clicked.connect(self.buttonWin2_onClick()):
-             #   i=0
-        else:
-            self.buttonEdit.setEnabled(False)
 
         self.adEditBlock.setLayout(grid)
         self.pageVbox = QVBoxLayout(self)
@@ -83,7 +78,9 @@ class AdEditPage1(QWidget):
     def buttonWin1_onClick(self):
         select_file = getOpenFilesAndDirs()
         if select_file:
+            self.pathEdit.clear()
             self.pathEdit.insert(select_file[0])
+            self.buttonEdit.setEnabled(True)
         else:
             msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
 

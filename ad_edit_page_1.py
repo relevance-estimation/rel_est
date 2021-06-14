@@ -19,12 +19,12 @@ class App(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        self.page = ad_edit_page_1(self)
+        self.page = AdEditPage1(self)
         self.setCentralWidget(self.page)
 
         self.show()
 
-class ad_edit_page_1(QWidget):
+class AdEditPage1(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()
@@ -32,10 +32,11 @@ class ad_edit_page_1(QWidget):
     def initUI(self):
         self.setWindowTitle("Редактирование рекламы")
         self.adEditBlock = QWidget(self)
-        self.adEditBlock.setGeometry(0, 0, 500, 500)
-        self.adEditBlock.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+
+        self.adEditBlock.setMaximumSize(500, 250)
 
         self.namewindow=QLabel('<h1>Редактирование ключевых слов</h1>')
+        self.namewindow.setAlignment(Qt.AlignCenter)
         self.namefile=QLabel('Имя файла')
         self.buttonoverview = QPushButton('Обзор', self)
         self.pathEdit = QLineEdit()
@@ -48,7 +49,7 @@ class ad_edit_page_1(QWidget):
 
         self.buttonoverview.clicked.connect(self.buttonWin1_onClick)
 
-        grid = QGridLayout(self.adEditBlock)
+        grid = QGridLayout()
         grid.setSpacing(10)
 
         grid.setVerticalSpacing (30)

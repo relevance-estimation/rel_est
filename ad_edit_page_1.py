@@ -2,8 +2,8 @@ import sys
 from PyQt5.QtGui     import *
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication,QLabel
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication,QLabel,QFileDialog
 
 signal_state = False
 
@@ -41,6 +41,7 @@ class AdEditPage1(QWidget):
         self.buttonoverview = QPushButton('Обзор', self)
         self.pathEdit = QLineEdit()
         self.buttonEdit= QPushButton('Редактировать', self)
+
 
         self.buttonEdit.setMaximumWidth(100)
         self.buttonoverview.setMaximumWidth(100)
@@ -80,9 +81,11 @@ class AdEditPage1(QWidget):
         self.setLayout(self.pageVbox)
 
     def buttonWin1_onClick(self):
-        #if i:
-        QMessageBox.information(None, 'Сообщение от программы', "Робит")
-        signal_state =True
+        select_file = getOpenFilesAndDirs()
+        if select_file:
+            self.pathEdit.insert(select_file[0])
+        else:
+            msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
 
     def buttonWin2_onClick(self):
         QMessageBox.information(None, 'Сообщение от программы', "Робит")
@@ -107,6 +110,53 @@ class AdEditPage1(QWidget):
         with f:
             data = f.read()
             self.textEdit.setText(data)
+
+
+def getOpenFilesAndDirs(parent=None, caption='', directory='',
+                        filter='', initialFilter='', options=None):
+    def updateText():
+        # обновить содержимое виджета редактирования строки выбранными файлами
+        selected = []
+        for index in view.selectionModel().selectedRows():
+            selected.append('"{}"'.format(index.data()))
+        pathEdit.setText(' '.join(selected))
+
+    dialog = QtWidgets.QFileDialog(parent, windowTitle=caption)
+    dialog.setFileMode(dialog.ExistingFiles)
+    if options:
+        dialog.setOptions(options)
+    dialog.setOption(dialog.DontUseNativeDialog, True)  # !!!
+    if directory:
+        dialog.setDirectory(directory)
+    if filter:
+        dialog.setNameFilter(filter)
+        if initialFilter:
+            dialog.selectNameFilter(initialFilter)
+
+    # по умолчанию, если каталог открыт в режиме списка файлов,
+    # QFileDialog.accept() показывает содержимое этого каталога,
+    # но нам нужно иметь возможность "открывать" и каталоги, как мы можем делать с файлами,
+    # поэтому мы просто переопределяем `accept()` с реализацией QDialog по умолчанию,
+    # которая просто вернет `dialog.selectedFiles()`
+
+    dialog.accept = lambda: QtWidgets.QDialog.accept(dialog)
+
+    # в неродном диалоге есть много представлений элементов,
+    # но те, которые отображают фактическое содержимое, создаются внутри QStackedWidget;
+    # это QTreeView и QListView, и дерево используется только тогда,
+    # когда viewMode установлен на QFileDialog.Details, что не в этом случае.
+
+    stackedWidget = dialog.findChild(QtWidgets.QStackedWidget)
+    view = stackedWidget.findChild(QtWidgets.QListView)
+    view.selectionModel().selectionChanged.connect(updateText)
+
+    pathEdit = dialog.findChild(QtWidgets.QLineEdit)
+    # очищаем содержимое строки редактирования всякий раз, когда изменяется текущий каталог
+    dialog.directoryEntered.connect(lambda: pathEdit.setText(''))
+
+    dialog.exec_()
+    return dialog.selectedFiles()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

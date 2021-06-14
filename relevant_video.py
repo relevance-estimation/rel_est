@@ -101,7 +101,8 @@ class RelevantVideo(QWidget):
         if select_file:
             self.pathVid.clear()
             self.pathVid.addItems(select_file)
-            self.buttonEdit.setEnabled(True)
+            if (self.pathVid.count()>0 and self.pathRec.count()>0):
+                self.buttonEdit.setEnabled(True)
         else:
             msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
 
@@ -110,7 +111,8 @@ class RelevantVideo(QWidget):
         if select_file:
             self.pathRec.clear()
             self.pathRec.addItems(select_file)
-            self.buttonEdit.setEnabled(True)
+            if (self.pathVid.count()>0 and self.pathRec.count()>0):
+                self.buttonEdit.setEnabled(True)
         else:
             msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
 

@@ -41,7 +41,7 @@ class RelevantMoment(QWidget):
         self.namewindow=QLabel('<h1>Релевантные моменты</h1>')
         self.namewindow.setAlignment(Qt.AlignCenter)
 
-        self.namewindow.setFixedHeight(100)
+        #self.namewindow.setFixedHeight()
 
         self.nameInfoVid=QLabel('Инфо-реклама')
         self.nameInfoRec=QLabel('Инфо-видео')

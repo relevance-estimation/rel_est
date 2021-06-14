@@ -49,14 +49,14 @@ class DownloadVideoPage(QWidget):
         self.adLinksBlock.setLayout(self.adLinksBlockVbox)
         self.adLinksBlockVbox.setContentsMargins(0, 0, 0, 0)
 
-        self.pageTitleLabel = QLabel("Скачивание видео")
+        self.pageTitleLabel = QLabel("Анализ видео")
         self.pageTitleLabel.setStyleSheet("""
             font: bold 18px;    
         """)
 
         self.pageTitleLabel.setAlignment(Qt.AlignCenter)
 
-        self.pageDownloadButton = QPushButton("Скачать")
+        self.pageDownloadButton = QPushButton("Анализ")
         self.pageDownloadInfo = QLabel("")
 
         self.pageVbox = QVBoxLayout()

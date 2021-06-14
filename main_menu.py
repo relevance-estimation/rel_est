@@ -40,8 +40,8 @@ class MainMenu(QWidget):
 
 
 
-        self.downloadAdButton = QPushButton("Скачать рекламу")
-        self.downloadVideoButton = QPushButton("Скачать видео")
+        self.downloadAdButton = QPushButton("Анализ рекламы")
+        self.downloadVideoButton = QPushButton("Анализ видео")
         self.editKeywordsButton = QPushButton("Ключевые слова")
         self.relMomentsButton = QPushButton("Релевантные моменты")
         self.relVideosButton = QPushButton("Релевантные видео")

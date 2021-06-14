@@ -69,14 +69,14 @@ class DownloadAdPage(QWidget):
         self.pageHbox.addWidget(self.adKeywordsBlock)
         self.pageHbox.setSpacing(20)
 
-        self.pageTitleLabel = QLabel("Скачивание рекламы")
+        self.pageTitleLabel = QLabel("Анализ рекламы")
         self.pageTitleLabel.setStyleSheet("""
             font: bold 18px;    
         """)
 
         self.pageTitleLabel.setAlignment(Qt.AlignCenter)
 
-        self.pageDownloadButton = QPushButton("Скачать")
+        self.pageDownloadButton = QPushButton("Анализ")
         self.pageDownloadInfo = QLabel("")
 
         self.pageVbox = QVBoxLayout()

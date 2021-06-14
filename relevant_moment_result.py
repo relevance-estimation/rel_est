@@ -34,14 +34,20 @@ class RelevantMomentResult(QWidget):
     def initUI(self):
         self.setWindowTitle("Редактирование рекламы")
         self.adEditBlock = QWidget(self)
-        self.adEditBlock.setGeometry(0, 0, 840, 680)
+        self.adEditBlock.setGeometry(0, 0, 500, 500)
+
 
         #self.adEditBlock.setMaximumSize(500, 250)
 
+        self.namewindow=QLabel('<h1>Релевантные моменты</h1>')
+        self.namewindow.setAlignment(Qt.AlignCenter)
+        self.pathInfoVid = QLineEdit()
+        self.namefile=QLabel('Имя файла: ')
 
 
         grid = QGridLayout()
-
+        grid.setSpacing(10)
+        grid.setVerticalSpacing(30)
 
         self.table = QTableWidget(self)
         self.table.setGeometry(0,0,700,405)
@@ -54,10 +60,20 @@ class RelevantMomentResult(QWidget):
 
 
         self.buttonReturn = QPushButton('Возврат', self)
-        grid.addWidget(self.buttonReturn, 1, 10)
+        grid.addWidget(self.buttonReturn, 3, 10)
+
+
+        grid.addWidget(self.namewindow, 0,1,1,10)
+        grid.addWidget(self.namefile, 1,1)
+        grid.addWidget(self.pathInfoVid, 1,2,1,9)
+
+        self.pathInfoVid.setMaximumWidth(500)
 
         self.table.resizeColumnsToContents()
-        grid.addWidget(self.table, 0, 0, 1, 11 )
+        grid.addWidget(self.table, 2, 1, 1, 10 )
+
+        self.table.resizeColumnsToContents()
+        self.table.resizeRowsToContents()
 
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -71,8 +87,7 @@ class RelevantMomentResult(QWidget):
         #self.vertical = self.table.horizontalHeader().resizeRowsToContents(QtGui.QHeaderView.stretchLastSection)
 
 
-        self.table.resizeColumnsToContents()
-        self.table.resizeRowsToContents()
+
         #self.vertical = self.table.
 
         self.adEditBlock.setLayout(grid)

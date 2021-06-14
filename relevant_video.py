@@ -43,63 +43,46 @@ class RelevantVideo(QWidget):
 
         #self.namewindow.setFixedHeight()
 
-        self.nameInfoVid=QLabel('Набор видео')
-        self.nameInfoRec=QLabel('Набор реклам')
+
         self.nameVid=QLabel('Набор видео')
         self.nameRec=QLabel('Набор реклам')
 
-        self.buttonInfoVid = QPushButton('Обзор', self)
-        self.buttonInfoRec = QPushButton('Обзор', self)
         self.buttonVid = QPushButton('Обзор', self)
         self.buttonRec = QPushButton('Обзор', self)
 
-        self.pathInfoVid = QLineEdit()
-        self.pathInfoRec = QLineEdit()
-        self.pathVid = QLineEdit()
-        self.pathRec = QLineEdit()
+        self.pathVid = QListWidget()
+        self.pathRec = QListWidget()
 
-        self.buttonEdit= QPushButton('Запуск', self)
+        self.buttonEdit= QPushButton('Анализ', self)
 
-        self.pathInfoVid.setReadOnly(True)
-        self.pathInfoRec.setReadOnly(True)
-        self.pathVid.setReadOnly(True)
-        self.pathRec.setReadOnly(True)
 
 
         #self.buttonEdit.setMaximumWidth(100)
 
         self.buttonEdit.setEnabled(False)
 
-        self.buttonInfoVid.clicked.connect(self.buttonWin1_onClick)
-        self.buttonInfoRec.clicked.connect(self.buttonWin2_onClick)
-        self.buttonVid.clicked.connect(self.buttonWin3_onClick)
-        self.buttonRec.clicked.connect(self.buttonWin4_onClick)
+        self.buttonVid.clicked.connect(self.buttonWin1_onClick)
+        self.buttonRec.clicked.connect(self.buttonWin2_onClick)
 
 
         grid = QGridLayout()
         grid.setSpacing(10)
 
         grid.setVerticalSpacing (30)
-        grid.setColumnStretch ( 0, 0 )
-        grid.setColumnStretch(1, 1)
-        grid.setColumnStretch(2, 1)
 
         grid.addWidget(self.namewindow, 0, 0,1,4)
 
-        grid.addWidget(self.nameInfoVid, 1, 0)
-        grid.addWidget(self.nameInfoRec, 2, 0)
-        grid.addWidget(self.nameVid, 3, 0)
-        grid.addWidget(self.nameRec, 4, 0)
+        grid.addWidget(self.nameVid, 1, 0)
+        grid.addWidget(self.nameRec, 3, 0)
 
-        grid.addWidget(self.pathInfoVid,1,1)
-        grid.addWidget(self.pathInfoRec,2,1)
-        grid.addWidget(self.pathVid,3,1)
-        grid.addWidget(self.pathRec,4,1)
 
-        grid.addWidget(self.buttonInfoVid, 1 , 2)
-        grid.addWidget(self.buttonInfoRec, 2 , 2)
-        grid.addWidget(self.buttonVid, 3 , 2)
-        grid.addWidget(self.buttonRec, 4 , 2)
+        grid.addWidget(self.pathVid,1,1,2,1)
+        grid.addWidget(self.pathRec,3,1,2,1)
+
+
+        grid.addWidget(self.buttonVid, 1 , 2)
+        grid.addWidget(self.buttonRec, 3 , 2)
+
 
 
         grid.addWidget(self.buttonEdit, 5 , 2)
@@ -116,12 +99,20 @@ class RelevantVideo(QWidget):
     def buttonWin1_onClick(self):
         select_file = getOpenFilesAndDirs()
         if select_file:
-            self.pathEdit.clear()
-            self.pathEdit.insert(select_file[0])
+            self.pathVid.clear()
+            self.pathVid.addItems(select_file)
             self.buttonEdit.setEnabled(True)
         else:
             msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
 
+    def buttonWin2_onClick(self):
+        select_file = getOpenFilesAndDirs()
+        if select_file:
+            self.pathRec.clear()
+            self.pathRec.addItems(select_file)
+            self.buttonEdit.setEnabled(True)
+        else:
+            msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
 
 
 

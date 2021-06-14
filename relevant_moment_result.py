@@ -3,7 +3,8 @@ import sys
 from PyQt5.QtGui     import *
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
+
 from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication,QLabel,\
     QFileDialog,QApplication, QMainWindow, QGridLayout, QWidget, QTableWidget,\
     QTableWidgetItem,QApplication,QWidget,QHeaderView
@@ -57,10 +58,22 @@ class RelevantMomentResult(QWidget):
 
         self.table.resizeColumnsToContents()
         grid.addWidget(self.table, 0, 0, 1, 11 )
-        self.header = self.table.horizontalHeader()
-        self.header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        self.header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        self.table.verticalHeader().setStretchLastSection(True)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+
+        self.table.showGrid()
+        #self.vertical = self.table.horizontalHeader().resizeRowsToContents(QtGui.QHeaderView.stretchLastSection)
+
+
+        self.table.resizeColumnsToContents()
+        self.table.resizeRowsToContents()
+        #self.vertical = self.table.
 
         self.adEditBlock.setLayout(grid)
         self.pageVbox = QVBoxLayout(self)

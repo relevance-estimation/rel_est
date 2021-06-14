@@ -45,9 +45,6 @@ class MainMenu(QWidget):
         self.editKeywordsButton = QPushButton("Ключевые слова")
         self.relMomentsButton = QPushButton("Релевантные моменты")
         self.relVideosButton = QPushButton("Релевантные видео")
-        self.channelAnalyticsButton = QPushButton("Анализ каналов")
-
-
 
         self.menuBlockVbox = QVBoxLayout()
 
@@ -65,7 +62,6 @@ class MainMenu(QWidget):
         self.menuBlockVbox.addWidget(self.editKeywordsButton)
         self.menuBlockVbox.addWidget(self.relMomentsButton)
         self.menuBlockVbox.addWidget(self.relVideosButton)
-        self.menuBlockVbox.addWidget(self.channelAnalyticsButton)
 
         self.menuBlockVbox.setSpacing(30)
 

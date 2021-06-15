@@ -46,10 +46,17 @@ class RelevantVideoPage(QWidget):
         # Add tabs
         self.tabs.addTab(self.tab1, "Загрузить")
         self.tabs.addTab(self.tab2, "Анализ")
+        self.tabs.setTabEnabled(1, False)
+
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
+
+        self.tab1.buttonEdit.clicked.connect(self.editResult)
+
+    def editResult(self):
+        self.tabs.setTabEnabled(1, True)
 
 
 if __name__ == '__main__':

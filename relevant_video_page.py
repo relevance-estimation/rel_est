@@ -90,6 +90,8 @@ class RelevantVideoPage(QWidget):
         #self.tab1.buttonEdit.clicked.connect(self.launch_success)
 
         self.tab2.listWidget.itemSelectionChanged.connect(self.selectAd)
+        #df = pd.DataFrame(data=[[1,2,3,4,5,6]])
+        #self.load_df(df)
 
     def browse_and_check(self, browseList):
         self.loadFiles(browseList)
@@ -110,7 +112,7 @@ class RelevantVideoPage(QWidget):
         self.tab2.table.setModel(model)
 
     def load_df(self, df):
-        df.columns = ["Имя файла", "Фрагмент", "Тип релевантности", "Оценка релевантности"]
+        df.columns = ["Имя файла", "Фрагмент", "Тип релевантности", "Общая оценка", "Текст", "Цвета"]
         self.tables.append(df)
 
     def clear_tables(self):

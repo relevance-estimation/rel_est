@@ -44,6 +44,7 @@ class RelevantMomentResult(QWidget):
         self.pathInfoVid = QLineEdit()
         self.namefile=QLabel('Имя файла: ')
 
+        self.pathInfoVid.setEnabled(False)
 
         grid = QGridLayout()
         grid.setSpacing(10)

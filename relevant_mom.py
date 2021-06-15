@@ -40,13 +40,20 @@ class AdEditPage(QWidget):
         self.tab1 = RelevantMoment(self.tabs)
         self.tab2 = RelevantMomentResult(self.tabs)
 
+
         # Add tabs
         self.tabs.addTab(self.tab1, "Выбор")
         self.tabs.addTab(self.tab2, "Результат")
+        self.tabs.setTabEnabled(1, False)
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
+
+        self.tab1.buttonEdit.clicked.connect(self.editResult)
+
+    def editResult(self):
+        self.tabs.setTabEnabled(1, True)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

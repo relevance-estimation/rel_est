@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QA
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QFont, QTextOption
 
+from functools import partial
 
 class App(QMainWindow):
     def __init__(self):
@@ -32,6 +33,7 @@ class DownloadAdPage(QWidget):
 
     def initUI(self):
         self.UiComponents()
+        self.signals()
 
     def UiComponents(self):
         self.adLinksBlock = QWidget()
@@ -111,6 +113,30 @@ class DownloadAdPage(QWidget):
             }
         """)
 
+    def signals(self):
+        self.adLinksBlockBrowse.clicked.connect(partial(self.read_file, self.adLinksBlockText))
+        self.adKeywordsBlockBrowse.clicked.connect(partial(self.read_file, self.adKeywordsBlockText))
+        self.saveVideosToButton.clicked.connect(partial(self.browse_directory, self.savePathLabel))
+
+    def read_file(self, textField):
+        select_file = QFileDialog.getOpenFileName(self)
+        if select_file[0] != "":
+            with open(select_file[0], 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+            textField.clear()
+            for line in lines:
+                textField.insertPlainText(line)
+
+    def browse_directory(self, label):
+        file = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        if file != "":
+            label.setText(file)
+
+    def update_progress(self, progress):
+        self.pageDownloadInfo.setText(progress)
+
+    def start_analysis_slot(self, slot):
+        self.pageDownloadButton.clicked.connect(slot)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

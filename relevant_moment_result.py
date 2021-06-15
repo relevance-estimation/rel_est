@@ -3,12 +3,6 @@ import sys
 from PyQt5.QtGui     import *
 from PyQt5.QtCore    import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtWidgets, QtCore, QtGui
-
-from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication,QLabel,\
-    QFileDialog,QApplication, QMainWindow, QGridLayout, QWidget, QTableWidget,\
-    QTableWidgetItem,QApplication,QWidget,QHeaderView
-
 
 class App(QMainWindow):
     def __init__(self):
@@ -50,18 +44,19 @@ class RelevantMomentResult(QWidget):
         grid.setSpacing(10)
         grid.setVerticalSpacing(30)
 
-        self.table = QTableWidget(self)
-        self.table.setGeometry(0,0,700,405)
-        self.table.setColumnCount(4)
-        self.table.setRowCount(10)
+        self.table = QTableView()
+        self.table.setMinimumSize(500, 300)
+        #self.table.setGeometry(0,0,700,405)
+        #self.table.setColumnCount(4)
+        #self.table.setRowCount(10)
 
-        self.table.setHorizontalHeaderLabels(["Путь к файлу", "Фрагмент", "Тип релевантности", "Оценка релевантности"])
+        #self.table.setHorizontalHeaderLabels(["Путь к файлу", "Фрагмент", "Тип релевантности", "Оценка релевантности"])
 
-        for i in range(3): self.table.horizontalHeaderItem(i).setTextAlignment(Qt.AlignHCenter)
+        #for i in range(3): self.table.horizontalHeaderItem(i).setTextAlignment(Qt.AlignHCenter)
 
 
-        self.buttonReturn = QPushButton('Возврат', self)
-        grid.addWidget(self.buttonReturn, 3, 10)
+        #self.buttonReturn = QPushButton('Возврат', self)
+        #grid.addWidget(self.buttonReturn, 3, 10)
 
 
         grid.addWidget(self.namewindow, 0,1,1,10)
@@ -70,7 +65,6 @@ class RelevantMomentResult(QWidget):
 
         self.pathInfoVid.setMaximumWidth(500)
 
-        self.table.resizeColumnsToContents()
         grid.addWidget(self.table, 2, 1, 1, 10 )
 
         self.table.resizeColumnsToContents()
@@ -82,7 +76,7 @@ class RelevantMomentResult(QWidget):
         #self.table.verticalHeader().setStretchLastSection(True)
         #self.table.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        #self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
 
         self.table.showGrid()
         #self.vertical = self.table.horizontalHeader().resizeRowsToContents(QtGui.QHeaderView.stretchLastSection)

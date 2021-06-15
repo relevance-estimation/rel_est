@@ -4,10 +4,9 @@
 import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
                             QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QListWidget, QTableWidget,
-                            QHeaderView, QTableWidgetItem)
-from PyQt5.QtCore import QRect, Qt
+                            QHeaderView, QTableWidgetItem, QTableView)
+from PyQt5.QtCore import QRect, Qt, QAbstractTableModel
 from PyQt5.QtGui import QFont
-
 
 class App(QMainWindow):
     def __init__(self):
@@ -42,12 +41,12 @@ class RelevantVideoResultPage(QWidget):
         self.listWidget.setMinimumSize(200, 500)
         self.listWidget.setMaximumWidth(200)
 
-        self.table = QTableWidget()
-        self.table.setMinimumSize(700, 500)
-        self.table.setColumnCount(4)
-        self.table.setRowCount(10)
+        self.table = QTableView()
+        self.table.setMinimumSize(500, 300)
+        #self.table.setColumnCount(4)
+        #self.table.setRowCount(10)
 
-        self.table.setHorizontalHeaderLabels(["Имя файла", "Фрагмент", "Тип релевантности", "Оценка релевантности"])
+        #self.table.setHorizontalHeaderLabels(["Имя файла", "Фрагмент", "Тип релевантности", "Оценка релевантности"])
 
         self.table.resizeColumnsToContents()
 
@@ -57,12 +56,12 @@ class RelevantVideoResultPage(QWidget):
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        #self.table.setEditTriggers(QTableWidget.NoEditTriggers)
 
 
         self.table.showGrid()
 
-        for i in range(3): self.table.horizontalHeaderItem(i).setTextAlignment(Qt.AlignHCenter)
+        #for i in range(3): self.table.horizontalHeaderItem(i).setTextAlignment(Qt.AlignHCenter)
 
         self.pageHbox = QHBoxLayout()
         self.pageHbox.addWidget(self.listWidget)

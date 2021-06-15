@@ -1,12 +1,40 @@
 import sys
 
 from PyQt5.QtWidgets import  QDesktopWidget, QApplication, QLabel, QFileDialog,\
-    QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,QVBoxLayout
+    QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,QVBoxLayout,\
+    QTableWidgetItem
+
+from PyQt5.QtCore import QRect, Qt, QAbstractTableModel
 
 from functools import partial
 
 from relevant_moment import RelevantMoment
 from relevant_moment_result import RelevantMomentResult
+
+import pandas as pd
+
+class PandasModel(QAbstractTableModel):
+
+    def __init__(self, data):
+        QAbstractTableModel.__init__(self)
+        self._data = data
+
+    def rowCount(self, parent=None):
+        return self._data.shape[0]
+
+    def columnCount(self, parnet=None):
+        return self._data.shape[1]
+
+    def data(self, index, role=Qt.DisplayRole):
+        if index.isValid():
+            if role == Qt.DisplayRole:
+                return str(self._data.iloc[index.row(), index.column()])
+        return None
+
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self._data.columns[col]
+        return None
 
 
 class App(QMainWindow):
@@ -78,6 +106,31 @@ class AdEditPage(QWidget):
         if select_file[0] != "":
             browseLabel.clear()
             browseLabel.insert(select_file[0])
+
+    def load_data(self, df):
+        df.columns = ["Имя файла", "Фрагмент", "Тип релевантности", "Оценка релевантности"]
+        self.tab2.table.setModel(PandasModel(df))
+
+    def launch_success(self):
+        self.tabs.setTabEnabled(1, True)
+        self.tabs.setCurrentIndex(1)
+        self.tab2.pathInfoVid.setText(self.tab1.pathInfoRec.text())
+        self.tab1.buttonEdit.setEnabled(False)
+
+    def start_analysis_slot(self, slot):
+        self.tab1.buttonEdit.clicked.connect(slot)
+
+    def get_ad_info_path(self):
+        return self.tab1.nameInfoRec.text()
+
+    def get_vid_info_path(self):
+        return self.tab1.nameInfoVid.text()
+
+    def get_ad_path(self):
+        return self.tab1.nameRec.text()
+
+    def get_vid_path(self):
+        return self.tab1.nameVid.text()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

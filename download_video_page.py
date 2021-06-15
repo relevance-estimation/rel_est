@@ -3,7 +3,8 @@
 
 import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
-                             QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QTextEdit, QFileDialog)
+                             QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QTextEdit, QFileDialog,
+                             QMessageBox)
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QFont, QTextOption
 from functools import partial
@@ -74,10 +75,12 @@ class DownloadVideoPage(QWidget):
         self.analysisHbox.setAlignment(Qt.AlignLeft)
         self.analysisHbox.setContentsMargins(0, 0, 0, 0)
         self.pageDownloadButton = QPushButton("Анализ")
+        self.pageCancelButton = QPushButton("Отмена")
         self.pageDownloadInfo = QLabel("")
         self.pageDownloadInfo.setMaximumWidth(300)
 
         self.analysisHbox.addWidget(self.pageDownloadButton)
+        self.analysisHbox.addWidget(self.pageCancelButton)
         self.analysisHbox.addWidget(self.pageDownloadInfo)
 
         self.pageVbox = QVBoxLayout()
@@ -95,17 +98,23 @@ class DownloadVideoPage(QWidget):
         """)
 
     def signals(self):
+        self.pageCancelButton.setEnabled(False)
         self.adLinksBlockBrowse.clicked.connect(partial(self.read_file, self.adLinksBlockText))
         self.saveVideosToButton.clicked.connect(partial(self.browse_directory, self.savePathLabel))
+
 
     def read_file(self, textField):
         select_file = QFileDialog.getOpenFileName(self)
         if select_file[0] != "":
-            with open(select_file[0], 'r', encoding='utf-8') as file:
-                lines = file.readlines()
-            textField.clear()
-            for line in lines:
-                textField.insertPlainText(line)
+            try:
+                with open(select_file[0], 'r', encoding='utf-8') as file:
+                    lines = file.readlines()
+                textField.clear()
+                for line in lines:
+                    textField.insertPlainText(line)
+            except:
+                QMessageBox.critical(self, "Ошибка при чтении файла",
+                                     "Убедитесь, что файл представляет собой текстовый документ")
 
     def browse_directory(self, label):
         file = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
@@ -115,8 +124,19 @@ class DownloadVideoPage(QWidget):
     def update_progress(self, progress):
         self.pageDownloadInfo.setText(progress)
 
+    def start_analysis(self):
+        self.pageDownloadButton.setEnabled(False)
+        self.pageCancelButton.setEnabled(True)
+
+    def cancel_analysis(self):
+        self.pageDownloadButton.setEnabled(True)
+        self.pageCancelButton.setEnabled(False)
+
     def start_analysis_slot(self, slot):
         self.pageDownloadButton.clicked.connect(slot)
+
+    def cancel_slot(self, slot):
+        self.pageCancelButton.clicked.connect(slot)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

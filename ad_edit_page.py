@@ -56,7 +56,7 @@ class AdEditPage(QWidget):
         self.tabs.setTabEnabled(1, False)
         self.tab1.buttonEdit.setEnabled(False)
         self.tab1.buttonoverview.clicked.connect(self.browse_file)
-        self.tab1.buttonEdit.clicked.connect(self.edit)
+        self.tab1.buttonEdit.clicked.connect(self.launch_success)
 
     def browse_file(self):
         select_file = QFileDialog.getOpenFileName(self)
@@ -65,9 +65,19 @@ class AdEditPage(QWidget):
             self.tab1.pathEdit.insert(select_file[0])
             self.tab1.buttonEdit.setEnabled(True)
 
-    def edit(self):
+    def launch_success(self):
         self.tabs.setTabEnabled(1, True)
         self.tabs.setCurrentIndex(1)
+        self.tab1.buttonEdit.setEnabled(False)
+
+    def edit_slot(self, slot):
+        self.tab1.buttonEdit.clicked.connect(slot)
+
+    def get_file_path(self):
+        return self.tab1.pathEdit.text()
+
+    def put_keywords(self, keywords):
+        self.tab2.keywordsEditLine.setText(keywords)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

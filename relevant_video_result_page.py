@@ -53,8 +53,10 @@ class RelevantVideoResultPage(QWidget):
         self.table.resizeColumnsToContents()
         self.table.resizeRowsToContents()
 
-        self.table.horizontalHeader().setStretchLastSection(True)
+        #self.table.horizontalHeader().setStretchLastSection(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        #self.table.horizontalHeader().sectionSize(QHeaderView.Stretch)
+        #self.table.resizeColumnsToContents()
 
         #self.table.setEditTriggers(QTableWidget.NoEditTriggers)
 

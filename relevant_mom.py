@@ -95,10 +95,14 @@ class AdEditPage(QWidget):
         self.tab1.buttonVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathVid))
         self.tab1.buttonRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathRec))
 
+        #self.tab1.buttonEdit.clicked.connect(self.launch_success)
+        #df = pd.DataFrame(data=[[1,2,3,4,5]])
+        #self.load_data(df)
+
     def browse_and_check(self, browseLabel):
         self.browse_file(browseLabel)
-        if self.tab1.pathInfoVid.text() != "" and self.tab1.pathInfoRec.text() != "" \
-            and self.tab1.pathVid.text() != "" and self.tab1.pathRec.text() != "":
+        if self.tab1.pathInfoVid.text() != "" and self.tab1.pathInfoRec.text() != "":
+            #and self.tab1.pathVid.text() != "" and self.tab1.pathRec.text() != "":
             self.tab1.buttonEdit.setEnabled(True)
 
     def browse_file(self, browseLabel):
@@ -108,7 +112,7 @@ class AdEditPage(QWidget):
             browseLabel.insert(select_file[0])
 
     def load_data(self, df):
-        df.columns = ["Имя файла", "Фрагмент", "Тип релевантности", "Оценка релевантности"]
+        df.columns = ["Фрагмент", "Тип релевантности", "Общая оценка", "Текст", "Цвета"]
         self.tab2.table.setModel(PandasModel(df))
 
     def launch_success(self):

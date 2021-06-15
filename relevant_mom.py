@@ -48,13 +48,13 @@ class App(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        self.page = AdEditPage(self)
+        self.page = RelevantMoments(self)
         self.setCentralWidget(self.page)
 
         self.show()
 
 
-class AdEditPage(QWidget):
+class RelevantMoments(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()

@@ -79,6 +79,18 @@ class DownloadAdPage(QWidget):
 
         self.pageTitleLabel.setAlignment(Qt.AlignCenter)
 
+        self.saveHbox = QHBoxLayout()
+        self.saveHbox.setAlignment(Qt.AlignLeft)
+        self.saveHbox.setContentsMargins(0, 0, 0, 0)
+        self.saveToLabel = QLabel("Место сохранения: ")
+        self.saveToButton = QPushButton("Обзор")
+        self.chosenPathLabel = QLabel("")
+        self.chosenPathLabel.setMaximumWidth(300)
+
+        self.saveHbox.addWidget(self.saveToLabel)
+        self.saveHbox.addWidget(self.saveToButton)
+        self.saveHbox.addWidget(self.chosenPathLabel)
+
         self.buttonsHbox = QHBoxLayout()
         self.buttonsHbox.setAlignment(Qt.AlignLeft)
         self.buttonsHbox.setContentsMargins(0, 0, 0, 0)
@@ -103,6 +115,7 @@ class DownloadAdPage(QWidget):
 
         self.pageVbox = QVBoxLayout()
         self.pageVbox.addWidget(self.pageTitleLabel)
+        self.pageVbox.addLayout(self.saveHbox)
         self.pageVbox.addLayout(self.pageHbox)
         self.pageVbox.addLayout(self.buttonsHbox)
         self.pageVbox.addLayout(self.analysisHbox)
@@ -117,13 +130,19 @@ class DownloadAdPage(QWidget):
         """)
 
     def signals(self):
+        self.pageDownloadButton.setEnabled(False)
         self.pageCancelButton.setEnabled(False)
         self.adLinksBlockBrowse.clicked.connect(partial(self.read_file, self.adLinksBlockText))
         self.adKeywordsBlockBrowse.clicked.connect(partial(self.read_file, self.adKeywordsBlockText))
         self.saveVideosToButton.clicked.connect(partial(self.browse_directory, self.savePathLabel))
+        self.saveToButton.clicked.connect(partial(self.browse_directory, self.chosenPathLabel))
+        self.saveToButton.clicked.connect(self.analysis_check)
 
-        self.adLinksBlockText.textChanged.connect(self.check_texts)
-        self.adKeywordsBlockText.textChanged.connect(self.check_texts)
+        self.adLinksBlockText.textChanged.connect(self.analysis_check)
+        self.adKeywordsBlockText.textChanged.connect(self.analysis_check)
+
+        self.pageDownloadButton.clicked.connect(self.start_analysis)
+        self.pageCancelButton.clicked.connect(self.cancel_analysis)
 
     def read_file(self, textField):
         select_file = QFileDialog.getOpenFileName(self)
@@ -150,10 +169,22 @@ class DownloadAdPage(QWidget):
     def start_analysis(self):
         self.pageDownloadButton.setEnabled(False)
         self.pageCancelButton.setEnabled(True)
+        self.saveToButton.setEnabled(False)
+        self.saveVideosToButton.setEnabled(False)
+        self.adLinksBlockBrowse.setEnabled(False)
+        self.adKeywordsBlockBrowse.setEnabled(False)
+        self.adLinksBlockText.setReadOnly(True)
+        self.adKeywordsBlockText.setReadOnly(True)
 
     def cancel_analysis(self):
         self.pageDownloadButton.setEnabled(True)
         self.pageCancelButton.setEnabled(False)
+        self.saveToButton.setEnabled(True)
+        self.saveVideosToButton.setEnabled(True)
+        self.adLinksBlockBrowse.setEnabled(True)
+        self.adKeywordsBlockBrowse.setEnabled(True)
+        self.adLinksBlockText.setReadOnly(False)
+        self.adKeywordsBlockText.setReadOnly(False)
 
     def start_analysis_slot(self, slot):
         self.pageDownloadButton.clicked.connect(slot)
@@ -170,15 +201,27 @@ class DownloadAdPage(QWidget):
     def check_keywords(self):
         return "," not in self.adKeywordsBlockText.toPlainText()
 
-    def check_same_size(self):
-        if len(self.adLinksBlockText.toPlainText().split('\n')) \
-           != len(self.adKeywordsBlockText.toPlainText().split('\n')):
-            return False
-        else:
-            return True
+    def get_save_info_path(self):
+        return self.savePathLabel.text()
+
+    def get_save_video_path(self):
+        return self.chosenPathLabel.text()
+
+    def check_size(self):
+        links_lines = self.adLinksBlockText.toPlainText().split('\n')
+        no_empty_lines = True
+        for line in links_lines:
+            if line.strip() == "":
+                no_empty_lines = False
+        return len(self.adLinksBlockText.toPlainText().split('\n')) \
+           >= len(self.adKeywordsBlockText.toPlainText().split('\n'))\
+            and no_empty_lines
 
     def check_texts(self):
-        if self.check_keywords() and self.check_same_size():
+        return self.check_keywords() and self.check_size()
+
+    def analysis_check(self):
+        if self.check_texts() and self.chosenPathLabel.text() != "":
             self.pageDownloadButton.setEnabled(True)
         else:
             self.pageDownloadButton.setEnabled(False)

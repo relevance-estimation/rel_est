@@ -3,6 +3,8 @@ import sys
 from PyQt5.QtWidgets import  QDesktopWidget, QApplication, QLabel, QFileDialog,\
     QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,QVBoxLayout
 
+from functools import partial
+
 from relevant_moment import RelevantMoment
 from relevant_moment_result import RelevantMomentResult
 
@@ -31,6 +33,7 @@ class AdEditPage(QWidget):
 
     def initUI(self):
         self.UiComponents()
+        self.signals()
 
     def UiComponents(self):
         self.layout = QVBoxLayout(self)
@@ -44,16 +47,37 @@ class AdEditPage(QWidget):
         # Add tabs
         self.tabs.addTab(self.tab1, "Выбор")
         self.tabs.addTab(self.tab2, "Результат")
-        self.tabs.setTabEnabled(1, False)
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
 
-        self.tab1.buttonEdit.clicked.connect(self.editResult)
+    def signals(self):
+        self.tabs.setTabEnabled(1, False)
 
-    def editResult(self):
-        self.tabs.setTabEnabled(1, True)
+        self.tab1.pathInfoVid.setReadOnly(True)
+        self.tab1.pathInfoRec.setReadOnly(True)
+        self.tab1.pathVid.setReadOnly(True)
+        self.tab1.pathRec.setReadOnly(True)
+
+        self.tab1.buttonEdit.setEnabled(False)
+
+        self.tab1.buttonInfoVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathInfoVid))
+        self.tab1.buttonInfoRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathInfoRec))
+        self.tab1.buttonVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathVid))
+        self.tab1.buttonRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathRec))
+
+    def browse_and_check(self, browseLabel):
+        self.browse_file(browseLabel)
+        if self.tab1.pathInfoVid.text() != "" and self.tab1.pathInfoRec.text() != "" \
+            and self.tab1.pathVid.text() != "" and self.tab1.pathRec.text() != "":
+            self.tab1.buttonEdit.setEnabled(True)
+
+    def browse_file(self, browseLabel):
+        select_file = QFileDialog.getOpenFileName(self)
+        if select_file[0] != "":
+            browseLabel.clear()
+            browseLabel.insert(select_file[0])
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

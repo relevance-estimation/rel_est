@@ -3,12 +3,13 @@
 
 import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
-                            QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit)
+                            QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QFileDialog)
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QFont
 from relevant_video import RelevantVideo
 from relevant_video_result_page import RelevantVideoResultPage
 
+from functools import partial
 
 class App(QMainWindow):
     def __init__(self):
@@ -34,6 +35,7 @@ class RelevantVideoPage(QWidget):
 
     def initUI(self):
         self.UiComponents()
+        self.signals()
 
     def UiComponents(self):
         self.layout = QVBoxLayout(self)
@@ -46,18 +48,31 @@ class RelevantVideoPage(QWidget):
         # Add tabs
         self.tabs.addTab(self.tab1, "Загрузить")
         self.tabs.addTab(self.tab2, "Анализ")
-        self.tabs.setTabEnabled(1, False)
 
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
 
-        self.tab1.buttonEdit.clicked.connect(self.editResult)
 
-    def editResult(self):
-        self.tabs.setTabEnabled(1, True)
+    def signals(self):
+        self.tabs.setTabEnabled(1, False)
+        self.tab1.buttonEdit.setEnabled(False)
 
+        self.tab1.buttonVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathVid))
+        self.tab1.buttonRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathRec))
+
+    def browse_and_check(self, browseList):
+        self.loadFiles(browseList)
+        if self.tab1.pathVid.count() != 0 and self.tab1.pathRec.count() != 0:
+            self.tab1.buttonEdit.setEnabled(True)
+
+    def loadFiles(self, browseList):
+        file_name = QFileDialog()
+        file_name.setFileMode(QFileDialog.ExistingFiles)
+        names = file_name.getOpenFileNames(self, "Open files", "C\\Desktop")[0]
+        for name in names:
+            browseList.addItem(name)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -60,7 +60,6 @@ class AdEditPage(QWidget):
 
     def browse_file(self):
         select_file = QFileDialog.getOpenFileName(self)
-        print(select_file)
         if select_file[0] != "":
             self.tab1.pathEdit.clear()
             self.tab1.pathEdit.insert(select_file[0])

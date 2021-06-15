@@ -42,17 +42,6 @@ class RelevantVideoResultPage(QWidget):
         self.listWidget.setMinimumSize(200, 500)
         self.listWidget.setMaximumWidth(200)
 
-        self.listWidget.addItem("Item 1")
-        self.listWidget.addItem("Item 2")
-        self.listWidget.addItem("Item 3")
-        self.listWidget.addItem("Item 4")
-        self.listWidget.addItem("Item 5")
-        self.listWidget.addItem("Item 6")
-        self.listWidget.addItem("Item 7")
-        self.listWidget.addItem("Item 8")
-        self.listWidget.addItem("Item 9")
-        self.listWidget.addItem("Item 10")
-
         self.table = QTableWidget()
         self.table.setMinimumSize(700, 500)
         self.table.setColumnCount(4)

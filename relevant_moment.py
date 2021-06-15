@@ -60,22 +60,6 @@ class RelevantMoment(QWidget):
 
         self.buttonEdit= QPushButton('Запуск', self)
 
-        self.pathInfoVid.setReadOnly(True)
-        self.pathInfoRec.setReadOnly(True)
-        self.pathVid.setReadOnly(True)
-        self.pathRec.setReadOnly(True)
-
-
-        #self.buttonEdit.setMaximumWidth(100)
-
-        self.buttonEdit.setEnabled(False)
-
-        self.buttonInfoVid.clicked.connect(self.buttonWin1_onClick)
-        self.buttonInfoRec.clicked.connect(self.buttonWin2_onClick)
-        self.buttonVid.clicked.connect(self.buttonWin3_onClick)
-        self.buttonRec.clicked.connect(self.buttonWin4_onClick)
-
-
         grid = QGridLayout()
         grid.setSpacing(10)
 
@@ -112,101 +96,6 @@ class RelevantMoment(QWidget):
         self.pageVbox.addLayout(self.pageHbox)
 
         self.setLayout(self.pageVbox)
-
-    def buttonWin1_onClick(self):
-        select_file = getOpenFilesAndDirs()
-        if select_file:
-            self.pathInfoVid.clear()
-            self.pathInfoVid.insert(select_file[0])
-            if (self.pathInfoVid.displayText()!=""
-                    and self.pathInfoRec.displayText()!=""
-                    and self.pathVid.displayText()!=""
-                    and self.pathRec.displayText()!=""):
-                self.buttonEdit.setEnabled(True)
-        else:
-            msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
-
-    def buttonWin2_onClick(self):
-        select_file = getOpenFilesAndDirs()
-        if select_file:
-            self.pathInfoRec.clear()
-            self.pathInfoRec.insert(select_file[0])
-            if (self.pathInfoVid.displayText()!=""
-                    and self.pathInfoRec.displayText()!=""
-                    and self.pathVid.displayText()!=""
-                    and self.pathRec.displayText()!=""):
-                self.buttonEdit.setEnabled(True)
-        else:
-            msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
-
-    def buttonWin3_onClick(self):
-        select_file = getOpenFilesAndDirs()
-        if select_file:
-            self.pathVid.clear()
-            self.pathVid.insert(select_file[0])
-            if (self.pathInfoVid.displayText()!=""
-                    and self.pathInfoRec.displayText()!=""
-                    and self.pathVid.displayText()!=""
-                    and self.pathRec.displayText()!=""):
-                self.buttonEdit.setEnabled(True)
-        else:
-            msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
-
-    def buttonWin4_onClick(self):
-        select_file = getOpenFilesAndDirs()
-        if select_file:
-            self.pathRec.clear()
-            self.pathRec.insert(select_file[0])
-            if (self.pathInfoVid.displayText() != ""
-                    and self.pathInfoRec.displayText() != ""
-                    and self.pathVid.displayText() != ""
-                    and self.pathRec.displayText() != ""):
-                self.buttonEdit.setEnabled(True)
-        else:
-            msg = QtWidgets.QMessageBox.information(self, 'Message', 'Вы ничего не выбрали.')
-
-
-
-    def center(self):
-
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-
-
-def getOpenFilesAndDirs(parent=None, caption='', directory='',
-                        filter='', initialFilter='', options=None):
-    def updateText():
-        selected = []
-        for index in view.selectionModel().selectedRows():
-            selected.append('"{}"'.format(index.data()))
-        pathEdit.setText(' '.join(selected))
-
-    dialog = QtWidgets.QFileDialog(parent, windowTitle=caption)
-    dialog.setFileMode(dialog.ExistingFiles)
-    if options:
-        dialog.setOptions(options)
-    dialog.setOption(dialog.DontUseNativeDialog, True)  # !!!
-    if directory:
-        dialog.setDirectory(directory)
-    if filter:
-        dialog.setNameFilter(filter)
-        if initialFilter:
-            dialog.selectNameFilter(initialFilter)
-
-    dialog.accept = lambda: QtWidgets.QDialog.accept(dialog)
-    stackedWidget = dialog.findChild(QtWidgets.QStackedWidget)
-    view = stackedWidget.findChild(QtWidgets.QListView)
-    view.selectionModel().selectionChanged.connect(updateText)
-
-    pathEdit = dialog.findChild(QtWidgets.QLineEdit)
-
-    dialog.directoryEntered.connect(lambda: pathEdit.setText(''))
-
-    dialog.exec_()
-    return dialog.selectedFiles()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

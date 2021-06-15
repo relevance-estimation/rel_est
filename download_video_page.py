@@ -40,12 +40,12 @@ class DownloadVideoPage(QWidget):
 
         self.adLinksBlockVbox = QVBoxLayout()
         self.adLinksBlockHeader = QLabel("Ссылки на видео")
-        self.adLinksBlockText = QTextEdit()
-        self.adLinksBlockText.setWordWrapMode(QTextOption.NoWrap)
+        self.vidLinksBlockText = QTextEdit()
+        self.vidLinksBlockText.setWordWrapMode(QTextOption.NoWrap)
         self.adLinksBlockBrowse = QPushButton("Обзор")
 
         self.adLinksBlockVbox.addWidget(self.adLinksBlockHeader)
-        self.adLinksBlockVbox.addWidget(self.adLinksBlockText)
+        self.adLinksBlockVbox.addWidget(self.vidLinksBlockText)
         self.adLinksBlockVbox.addWidget(self.adLinksBlockBrowse)
 
         self.adLinksBlock.setLayout(self.adLinksBlockVbox)
@@ -99,7 +99,7 @@ class DownloadVideoPage(QWidget):
 
     def signals(self):
         self.pageCancelButton.setEnabled(False)
-        self.adLinksBlockBrowse.clicked.connect(partial(self.read_file, self.adLinksBlockText))
+        self.adLinksBlockBrowse.clicked.connect(partial(self.read_file, self.vidLinksBlockText))
         self.saveVideosToButton.clicked.connect(partial(self.browse_directory, self.savePathLabel))
 
 
@@ -138,6 +138,9 @@ class DownloadVideoPage(QWidget):
     def cancel_slot(self, slot):
         self.pageCancelButton.clicked.connect(slot)
 
+    def get_links(self):
+        return self.vidLinksBlockText.toPlainText().split('\n')
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = App()

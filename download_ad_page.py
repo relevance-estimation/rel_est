@@ -122,6 +122,9 @@ class DownloadAdPage(QWidget):
         self.adKeywordsBlockBrowse.clicked.connect(partial(self.read_file, self.adKeywordsBlockText))
         self.saveVideosToButton.clicked.connect(partial(self.browse_directory, self.savePathLabel))
 
+        self.adLinksBlockText.textChanged.connect(self.check_texts)
+        self.adKeywordsBlockText.textChanged.connect(self.check_texts)
+
     def read_file(self, textField):
         select_file = QFileDialog.getOpenFileName(self)
         if select_file[0] != "":
@@ -157,6 +160,28 @@ class DownloadAdPage(QWidget):
 
     def cancel_slot(self, slot):
         self.pageCancelButton.clicked.connect(slot)
+
+    def get_links(self):
+        return self.adLinksBlockText.toPlainText().split('\n')
+
+    def get_keywords(self):
+        return [[token for token in tokens] for tokens in self.adKeywordsBlockText.toPlainText().split('\n')]
+
+    def check_keywords(self):
+        return "," not in self.adKeywordsBlockText.toPlainText()
+
+    def check_same_size(self):
+        if len(self.adLinksBlockText.toPlainText().split('\n')) \
+           != len(self.adKeywordsBlockText.toPlainText().split('\n')):
+            return False
+        else:
+            return True
+
+    def check_texts(self):
+        if self.check_keywords() and self.check_same_size():
+            self.pageDownloadButton.setEnabled(True)
+        else:
+            self.pageDownloadButton.setEnabled(False)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout
+from PyQt5.QtWidgets import QDesktopWidget, QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 from ad_edit_page import AdEditPage
@@ -26,6 +26,9 @@ class Window(QtWidgets.QMainWindow):
         self.stacked_widget = QtWidgets.QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
 
+        self.center()
+
+
         self.m_pages = {}
 
         self.register(MainMenu(self), "main")
@@ -35,6 +38,12 @@ class Window(QtWidgets.QMainWindow):
 
         #self.dowloadAdButton.clicked.connect(self.make_handleButton("adEditPage"))
 
+    def center(self):
+
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def make_handleButton(self, button):
         def handleButton():

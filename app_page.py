@@ -33,6 +33,11 @@ class Window(QtWidgets.QMainWindow):
 
         self.register(MainMenu(self), "main")
         self.register(AdEditPage(self), "adEditPage")
+        self.register(DownloadAdPage(self), "DownloadAdPage")
+        self.register(DownloadVideoPage(self), "DownloadVideoPage")
+        self.register(RelevantMoments(self), "RelevantMoments")
+        self.register(RelevantVideoPage(self), "RelevantVideoPage")
+
 
         self.goto("main")
 
@@ -45,17 +50,6 @@ class Window(QtWidgets.QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    def make_handleButton(self, button):
-        def handleButton():
-            if button == "adEditPage":
-                self.goto("adEditPage")
-        return handleButton
-
-    def register(self, widget, name):
-        self.m_pages[name] = widget
-        self.stacked_widget.addWidget(widget)
-        if isinstance(widget, PageWindow):
-            widget.gotoSignal.connect(self.goto)
 
     @QtCore.pyqtSlot(str)
     def goto(self, name):

@@ -26,7 +26,7 @@ class Window(QtWidgets.QMainWindow):
         self.stacked_widget = QtWidgets.QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
 
-        self.center()
+
 
 
         self.m_pages = {}
@@ -37,9 +37,9 @@ class Window(QtWidgets.QMainWindow):
         self.register(DownloadVideoPage(self), "DownloadVideoPage")
         self.register(RelevantMoments(self), "RelevantMoments")
         self.register(RelevantVideoPage(self), "RelevantVideoPage")
-
-
         self.goto("main")
+        self.center()
+
 
         #self.dowloadAdButton.clicked.connect(self.make_handleButton("adEditPage"))
 
@@ -50,6 +50,11 @@ class Window(QtWidgets.QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    def register(self, widget, name):
+        self.m_pages[name] = widget
+        self.stacked_widget.addWidget(widget)
+        if isinstance(widget, PageWindow):
+            widget.gotoSignal.connect(self.goto)
 
     @QtCore.pyqtSlot(str)
     def goto(self, name):

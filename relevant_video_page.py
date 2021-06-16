@@ -89,11 +89,15 @@ class RelevantVideoPage(QWidget):
         self.tab1.buttonVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathVid))
         self.tab1.buttonRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathRec))
 
-        #self.tab1.buttonEdit.clicked.connect(self.launch_success)
+        self.tab1.buttonEdit.clicked.connect(self.launch_success)
 
         self.tab2.listWidget.itemSelectionChanged.connect(self.selectAd)
-        #df = pd.DataFrame(data=[[1,2,3,4,5,6]])
-        #self.load_df(df)
+        df1 = pd.DataFrame(data=[[1,2,3,4,5,6], [1,2,3,4,5,6],[1,2,3,4,5,6]])
+        df2 = pd.DataFrame(data=[["a", "b", "c", "d", "e", "f"], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]])
+        df3 = pd.DataFrame(data=[[1000, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]])
+        self.load_df(df1)
+        self.load_df(df2)
+        self.load_df(df3)
 
     def browse_and_check(self, browseList):
         self.loadFiles(browseList)

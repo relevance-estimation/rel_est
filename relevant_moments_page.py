@@ -97,9 +97,9 @@ class RelevantMoments(QWidget):
         self.tab1.buttonVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathVid))
         self.tab1.buttonRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathRec))
 
-        #self.tab1.buttonEdit.clicked.connect(self.launch_success)
-        #df = pd.DataFrame(data=[[1,2,3,4,5]])
-        #self.load_data(df)
+        self.tab1.buttonEdit.clicked.connect(self.launch_success)
+        df = pd.DataFrame(data=[[1,2,3,4,5]])
+        self.load_data(df)
 
     def browse_and_check(self, browseLabel):
         self.browse_file(browseLabel)

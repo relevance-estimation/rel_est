@@ -13,33 +13,43 @@ from main_menu import MainMenu
 from analyze_ad import AdAnalyzePage
 from analyze_video import VidAnalyzePage
 
-
-class PageWindow(QtWidgets.QMainWindow):
-    gotoSignal = QtCore.pyqtSignal(str)
-
-    def goto(self, name):
-        self.gotoSignal.emit(name)
-
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.stacked_widget = QtWidgets.QStackedWidget()
-        self.setCentralWidget(self.stacked_widget)
-
-        self.m_pages = {}
-
-        self.register(MainMenu(self), "main")
-        self.register(AdEditPage(self), "adEditPage")
-        self.register(AdAnalyzePage(self), "AdAnalyzePage")
-        self.register(VidAnalyzePage(self), "VidAnalyzePage")
-        self.register(RelevantMoments(self), "RelevantMoments")
-        self.register(RelevantVideoPage(self), "RelevantVideoPage")
-        self.goto("main")
+        self.initUI()
         self.center()
+        self.signals()
 
+    def initUI(self):
+        self.widget = QtWidgets.QWidget()
+        self.vbox = QtWidgets.QVBoxLayout()
 
-        #self.dowloadAdButton.clicked.connect(self.make_handleButton("adEditPage"))
+        self.goToMenu = QtWidgets.QPushButton("Назад")
+        self.goToMenu.setMaximumWidth(70)
+        self.stacked_widget = QtWidgets.QStackedWidget()
+
+        self.vbox.addWidget(self.goToMenu)
+        self.vbox.addWidget(self.stacked_widget)
+
+        self.widget.setLayout(self.vbox)
+
+        self.setCentralWidget(self.widget)
+
+        self.MainMenu = MainMenu(self)
+        self.AdEditPage = AdEditPage(self)
+        self.AdAnalyzePage = AdAnalyzePage(self)
+        self.VidAnalyzePage = VidAnalyzePage(self)
+        self.RelevantMoments = RelevantMoments(self)
+        self.RelevantVideoPage = RelevantVideoPage(self)
+
+        self.stacked_widget.addWidget(self.MainMenu)
+        self.stacked_widget.addWidget(self.AdEditPage)
+        self.stacked_widget.addWidget(self.AdAnalyzePage)
+        self.stacked_widget.addWidget(self.VidAnalyzePage)
+        self.stacked_widget.addWidget(self.RelevantMoments)
+        self.stacked_widget.addWidget(self.RelevantVideoPage)
+
+        self.setWindowTitle("Оценка релевантности видео")
 
     def center(self):
         qr = self.frameGeometry()
@@ -47,18 +57,16 @@ class Window(QtWidgets.QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    def register(self, widget, name):
-        self.m_pages[name] = widget
-        self.stacked_widget.addWidget(widget)
-        if isinstance(widget, PageWindow):
-            widget.gotoSignal.connect(self.goto)
+    def signals(self):
+        self.goToMenu.setVisible(False)
+        self.stacked_widget.currentChanged.connect(self.goto)
+        self.stacked_widget.setCurrentWidget(self.MainMenu)
 
-    @QtCore.pyqtSlot(str)
-    def goto(self, name):
-        if name in self.m_pages:
-            widget = self.m_pages[name]
-            self.stacked_widget.setCurrentWidget(widget)
-            self.setWindowTitle(widget.windowTitle())
+    def goto(self, i):
+        if self.stacked_widget.currentWidget() == self.MainMenu:
+            self.goToMenu.setVisible(False)
+        else:
+            self.goToMenu.setVisible(True)
 
 
 if __name__ == "__main__":

@@ -28,6 +28,7 @@ class AdAnalyzePage(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()
+        self.setWindowTitle("Анализ рекламы")
 
     def initUI(self):
         self.UiComponents()
@@ -35,6 +36,7 @@ class AdAnalyzePage(QWidget):
 
     def UiComponents(self):
         self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         # Initialize tab screen
         self.tabs = QTabWidget()

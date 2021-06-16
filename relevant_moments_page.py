@@ -65,6 +65,7 @@ class RelevantMoments(QWidget):
 
     def UiComponents(self):
         self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         # Initialize tab screen
         self.tabs = QTabWidget()

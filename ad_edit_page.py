@@ -62,7 +62,6 @@ class AdEditPage(QWidget):
         self.tabs.setTabEnabled(1, False)
         self.tab1.buttonEdit.setEnabled(False)
         self.tab1.buttonoverview.clicked.connect(self.browse_file)
-        self.tab1.buttonEdit.clicked.connect(self.launch_success)
 
     def browse_file(self):
             select_file = QFileDialog.getOpenFileName(self)
@@ -97,7 +96,7 @@ class AdEditPageController():
         self.signals()
 
     def signals(self):
-        self.ad_edit_page.edit_slot(self.check_file())
+        self.ad_edit_page.edit_slot(self.check_file)
 
     def check_file(self):
         try:
@@ -115,8 +114,6 @@ class AdEditPageController():
         except:
             self.ad_edit_page.show_error( "Ошибка доступа к ключевым словам")
             self.ad_edit_page.launch_fail()
-
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

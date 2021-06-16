@@ -27,9 +27,6 @@ class Window(QtWidgets.QMainWindow):
         self.stacked_widget = QtWidgets.QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
 
-
-
-
         self.m_pages = {}
 
         self.register(MainMenu(self), "main")
@@ -45,7 +42,6 @@ class Window(QtWidgets.QMainWindow):
         #self.dowloadAdButton.clicked.connect(self.make_handleButton("adEditPage"))
 
     def center(self):
-
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
@@ -66,8 +62,6 @@ class Window(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-    import sys
-
     app = QtWidgets.QApplication(sys.argv)
     w = Window()
     w.show()

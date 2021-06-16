@@ -78,8 +78,14 @@ class AdEditPage(QWidget):
     def edit_slot(self, slot):
         self.tab1.buttonEdit.clicked.connect(slot)
 
+    def save_slot(self, slot):
+        self.tab2.saveAsButton.clicked.connect(slot)
+
     def get_file_path(self):
         return self.tab1.pathEdit.text()
+
+    def get_file_path_page_2(self):
+        return self.chosenPathLabel.text()
 
     def put_keywords(self, keywords):
         self.tab2.keywordsEditLine.setText(keywords)
@@ -90,6 +96,11 @@ class AdEditPage(QWidget):
     def launch_fail(self):
         self.tab1.buttonEdit.setEnabled(False)
 
+    def get_keyword(self):
+        return self.tab2.keywordsEditLine.text()
+
+
+
 class AdEditPageController():
     def __init__(self, ad_edit_page):
         self.ad_edit_page = ad_edit_page
@@ -97,6 +108,7 @@ class AdEditPageController():
 
     def signals(self):
         self.ad_edit_page.edit_slot(self.check_file)
+        self.ad_edit_page.save_slot(self.save_keyword)
 
     def check_file(self):
         try:
@@ -114,6 +126,18 @@ class AdEditPageController():
         except:
             self.ad_edit_page.show_error( "Ошибка доступа к ключевым словам")
             self.ad_edit_page.launch_fail()
+
+    def save_keyword(self):
+        try:
+            filename = self.ad_edit_page.get_file_path_page_2()
+            keywords = self.ad_edit_page.get_keyword()
+            with open(filename, "rb") as f:
+                vids = pickle.load(f)
+            vids.videos[0].keywords = keywords.split()
+            pickle.dump(vids, filename)
+        except:
+            self.show_error("Ошибка открытия")
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

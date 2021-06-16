@@ -74,8 +74,6 @@ class AdEditPage2(QWidget):
         self.adEditBlockVbox.addStretch()
         self.adEditBlockVbox.setSpacing(30)
 
-        self.saveAsButton.clicked.connect(self.read_file)
-
         self.adEditBlock.setLayout(self.adEditBlockVbox)
 
         self.pageVbox = QVBoxLayout(self)
@@ -84,13 +82,6 @@ class AdEditPage2(QWidget):
         self.pageVbox.addLayout(self.pageHbox)
 
         self.setLayout(self.pageVbox)
-
-    def read_file(self):
-        filename = self.chosenPathLabel.text()
-        with open(filename, "rb") as f:
-            vids = pickle.load(f)
-        vids.videos[0].keywords = keywords.split()
-        pickle.dump(vids, filename)
 
 
 if __name__ == '__main__':

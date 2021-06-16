@@ -75,6 +75,10 @@ class AdEditPage(QWidget):
         self.tabs.setCurrentIndex(1)
         self.tab1.buttonEdit.setEnabled(False)
 
+    def save_success(self):
+        self.tabs.setCurrentIndex(0)
+        self.tab2.saveAsButton.setEnabled(False)
+
     def edit_slot(self, slot):
         self.tab1.buttonEdit.clicked.connect(slot)
 
@@ -92,6 +96,9 @@ class AdEditPage(QWidget):
 
     def launch_fail(self):
         self.tab1.buttonEdit.setEnabled(False)
+
+    def save_fail(self):
+        self.tab2.saveAsButton.setEnabled(False)
 
     def get_keywords(self):
         return self.tab2.keywordsEditLine.text()
@@ -132,8 +139,10 @@ class AdEditPageController():
         self.vids.videos[0].keywords = keywords.split()
         try:
             pickle.dump(self.vids, self.filename)
+            self.ad_edit_page.save_success()
         except:
             self.show_error("Ошибка сохранения")
+            self.ad_edit_page.save_fail()
 
 
 if __name__ == '__main__':

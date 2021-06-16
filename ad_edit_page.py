@@ -24,7 +24,7 @@ class App(QMainWindow):
 
         self.page = AdEditPage(self)
 
-        self.page_controller = AdEditPageConntroller(self.page)
+        self.page_controller = AdEditPageController(self.page)
 
         self.setCentralWidget(self.page)
 
@@ -91,7 +91,7 @@ class AdEditPage(QWidget):
     def launch_fail(self):
         self.tab1.buttonEdit.setEnabled(False)
 
-class AdEditPageConntroller():
+class AdEditPageController():
     def __init__(self, ad_edit_page):
         self.ad_edit_page = ad_edit_page
         self.signals()

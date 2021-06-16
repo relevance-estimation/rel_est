@@ -202,10 +202,10 @@ class DownloadAdPage(QWidget):
         return "," not in self.adKeywordsBlockText.toPlainText()
 
     def get_save_info_path(self):
-        return self.savePathLabel.text()
+        return self.chosenPathLabel.text()
 
     def get_save_video_path(self):
-        return self.chosenPathLabel.text()
+        return self.savePathLabel.text()
 
     def check_size(self):
         links_lines = self.adLinksBlockText.toPlainText().split('\n')

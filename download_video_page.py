@@ -167,10 +167,10 @@ class DownloadVideoPage(QWidget):
         return self.adLinksBlockText.toPlainText().split('\n')
 
     def get_save_info_path(self):
-        return self.savePathLabel.text()
+        return self.chosenPathLabel.text()
 
     def get_save_video_path(self):
-        return self.chosenPathLabel.text()
+        return self.savePathLabel.text()
 
     def check_size(self):
         links_lines = self.adLinksBlockText.toPlainText().split('\n')

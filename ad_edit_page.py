@@ -78,6 +78,8 @@ class AdEditPage(QWidget):
     def save_success(self):
         self.tabs.setCurrentIndex(0)
         self.tab2.saveAsButton.setEnabled(False)
+        self.tab1.buttonEdit.setEnabled(False)
+
 
     def edit_slot(self, slot):
         self.tab1.buttonEdit.clicked.connect(slot)

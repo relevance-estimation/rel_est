@@ -38,8 +38,6 @@ class MainMenu(QWidget):
 
         self.menuBlock.setMaximumSize(600, 700)
 
-
-
         self.downloadAdButton = QPushButton("Анализ рекламы")
         self.downloadVideoButton = QPushButton("Анализ видео")
         self.editKeywordsButton = QPushButton("Ключевые слова")
@@ -74,6 +72,20 @@ class MainMenu(QWidget):
 
         self.setLayout(self.pageVbox)
 
+    def ad_analyze_slot(self, slot):
+        self.downloadAdButton.clicked.connect(slot)
+
+    def video_analyze_slot(self, slot):
+        self.downloadVideoButton.clicked.connect(slot)
+
+    def edit_keywords_slot(self, slot):
+        self.editKeywordsButton.clicked.connect(slot)
+
+    def relevant_moments_slot(self, slot):
+        self.relMomentsButton.clicked.connect(slot)
+
+    def relevant_videos_slot(self, slot):
+        self.relVideosButton.clicked.connect(slot)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -84,9 +84,6 @@ class AdEditPage(QWidget):
     def get_file_path(self):
         return self.tab1.pathEdit.text()
 
-    def get_file_path_page_2(self):
-        return self.chosenPathLabel.text()
-
     def put_keywords(self, keywords):
         self.tab2.keywordsEditLine.setText(keywords)
 
@@ -96,7 +93,7 @@ class AdEditPage(QWidget):
     def launch_fail(self):
         self.tab1.buttonEdit.setEnabled(False)
 
-    def get_keyword(self):
+    def get_keywords(self):
         return self.tab2.keywordsEditLine.text()
 
 
@@ -108,17 +105,20 @@ class AdEditPageController():
 
     def signals(self):
         self.ad_edit_page.edit_slot(self.check_file)
-        self.ad_edit_page.save_slot(self.save_keyword)
+        self.ad_edit_page.save_slot(self.save_keywords)
 
     def check_file(self):
         try:
             filename = self.ad_edit_page.get_file_path()
             with open(filename, "rb") as f:
+                f.seek(0)
                 vids = pickle.load(f)
         except:
             self.ad_edit_page.show_error("Ошибка при чтении файла")
             self.ad_edit_page.launch_fail()
             return
+        self.filename = filename
+        self.vids = vids
         try:
             keywords="".join(vids.videos[0].keywords)
             self.ad_edit_page.put_keywords(keywords)
@@ -127,16 +127,13 @@ class AdEditPageController():
             self.ad_edit_page.show_error( "Ошибка доступа к ключевым словам")
             self.ad_edit_page.launch_fail()
 
-    def save_keyword(self):
+    def save_keywords(self):
+        keywords = self.ad_edit_page.get_keywords()
+        self.vids.videos[0].keywords = keywords.split()
         try:
-            filename = self.ad_edit_page.get_file_path_page_2()
-            keywords = self.ad_edit_page.get_keyword()
-            with open(filename, "rb") as f:
-                vids = pickle.load(f)
-            vids.videos[0].keywords = keywords.split()
-            pickle.dump(vids, filename)
+            pickle.dump(self.vids, self.filename)
         except:
-            self.show_error("Ошибка открытия")
+            self.show_error("Ошибка сохранения")
 
 
 if __name__ == '__main__':

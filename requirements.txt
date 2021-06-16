@@ -9,3 +9,4 @@ pymystem3
 nltk
 ffmpeg
 opencv-python
+vosk

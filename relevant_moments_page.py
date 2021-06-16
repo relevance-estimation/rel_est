@@ -58,6 +58,7 @@ class RelevantMoments(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()
+        self.setWindowTitle("Релевантные моменты")
 
     def initUI(self):
         self.UiComponents()

@@ -28,6 +28,7 @@ class VidAnalyzePage(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()
+        self.setWindowTitle("Анализ видео")
 
     def initUI(self):
         self.UiComponents()

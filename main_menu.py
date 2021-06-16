@@ -29,6 +29,7 @@ class MainMenu(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()
+        self.setWindowTitle("Оценка релевантности видео")
 
     def initUI(self):
         self.UiComponents()

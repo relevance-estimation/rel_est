@@ -56,6 +56,7 @@ class RelevantVideoPage(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()
+        self.setWindowTitle("Релевантные видео")
 
     def initUI(self):
         self.UiComponents()

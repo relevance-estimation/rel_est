@@ -13,6 +13,8 @@ from main_menu import MainMenu
 from analyze_ad import AdAnalyzePage
 from analyze_video import VidAnalyzePage
 
+from functools import partial
+
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -57,10 +59,24 @@ class Window(QtWidgets.QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    def set_widget(self, widget):
+        self.stacked_widget.setCurrentWidget(widget)
+        self.setWindowTitle(widget.windowTitle())
+
     def signals(self):
         self.goToMenu.setVisible(False)
         self.stacked_widget.currentChanged.connect(self.goto)
         self.stacked_widget.setCurrentWidget(self.MainMenu)
+        self.goToMenu.clicked.connect(partial(self.set_widget, self.MainMenu))
+
+        self.main_menu_signals()
+
+    def main_menu_signals(self):
+        self.MainMenu.edit_keywords_slot(partial(self.set_widget, self.AdEditPage))
+        self.MainMenu.ad_analyze_slot(partial(self.set_widget, self.AdAnalyzePage))
+        self.MainMenu.video_analyze_slot(partial(self.set_widget, self.VidAnalyzePage))
+        self.MainMenu.relevant_moments_slot(partial(self.set_widget, self.RelevantMoments))
+        self.MainMenu.relevant_videos_slot(partial(self.set_widget, self.RelevantVideoPage))
 
     def goto(self, i):
         if self.stacked_widget.currentWidget() == self.MainMenu:

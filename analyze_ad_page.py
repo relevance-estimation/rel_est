@@ -4,7 +4,7 @@
 import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
                             QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QTextEdit, QFileDialog,
-                            QMessageBox,QListWidget)
+                            QMessageBox, QListWidget)
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QFont, QTextOption
 
@@ -21,13 +21,13 @@ class App(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        self.page = AnalyzeAdPage(self)
+        self.page = DownloadAdPage(self)
         self.setCentralWidget(self.page)
 
         self.show()
 
 
-class AnalyzeAdPage(QWidget):
+class DownloadAdPage(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()
@@ -40,7 +40,7 @@ class AnalyzeAdPage(QWidget):
         self.adLinksBlock = QWidget()
 
         self.adLinksBlockVbox = QVBoxLayout()
-        self.adLinksBlockHeader = QLabel("Ссылки на видео")
+        self.adLinksBlockHeader = QLabel("Пути к видео")
         self.adLinksBlockText = QListWidget()
         self.adLinksBlockBrowse = QPushButton("Обзор")
 
@@ -78,13 +78,17 @@ class AnalyzeAdPage(QWidget):
 
         self.pageTitleLabel.setAlignment(Qt.AlignCenter)
 
-        self.buttonsHbox = QHBoxLayout()
-        self.buttonsHbox.setAlignment(Qt.AlignLeft)
-        self.buttonsHbox.setContentsMargins(0, 0, 0, 0)
-        self.savePathLabel = QLabel("")
-        self.savePathLabel.setMaximumWidth(300)
+        self.saveHbox = QHBoxLayout()
+        self.saveHbox.setAlignment(Qt.AlignLeft)
+        self.saveHbox.setContentsMargins(0, 0, 0, 0)
+        self.saveToLabel = QLabel("Место сохранения: ")
+        self.saveToButton = QPushButton("Обзор")
+        self.chosenPathLabel = QLabel("")
+        self.chosenPathLabel.setMaximumWidth(300)
 
-        self.buttonsHbox.addWidget(self.savePathLabel)
+        self.saveHbox.addWidget(self.saveToLabel)
+        self.saveHbox.addWidget(self.saveToButton)
+        self.saveHbox.addWidget(self.chosenPathLabel)
 
         self.analysisHbox = QHBoxLayout()
         self.analysisHbox.setAlignment(Qt.AlignLeft)
@@ -100,8 +104,8 @@ class AnalyzeAdPage(QWidget):
 
         self.pageVbox = QVBoxLayout()
         self.pageVbox.addWidget(self.pageTitleLabel)
+        self.pageVbox.addLayout(self.saveHbox)
         self.pageVbox.addLayout(self.pageHbox)
-        self.pageVbox.addLayout(self.buttonsHbox)
         self.pageVbox.addLayout(self.analysisHbox)
 
         self.setLayout(self.pageVbox)
@@ -114,12 +118,17 @@ class AnalyzeAdPage(QWidget):
         """)
 
     def signals(self):
+        self.pageDownloadButton.setEnabled(False)
         self.pageCancelButton.setEnabled(False)
         self.adLinksBlockBrowse.clicked.connect(partial(self.loadFiles, self.adLinksBlockText))
         self.adKeywordsBlockBrowse.clicked.connect(partial(self.read_file, self.adKeywordsBlockText))
+        self.saveToButton.clicked.connect(partial(self.browse_directory, self.chosenPathLabel))
 
-        self.adLinksBlockText.itemSelectionChanged.connect(self.check_texts)
-        self.adKeywordsBlockText.textChanged.connect(self.check_texts)
+        self.adLinksBlockText.itemSelectionChanged.connect(self.analysis_check)
+        self.adKeywordsBlockText.textChanged.connect(self.analysis_check)
+
+        self.pageDownloadButton.clicked.connect(self.start_analysis)
+        self.pageCancelButton.clicked.connect(self.cancel_analysis)
 
     def read_file(self, textField):
         select_file = QFileDialog.getOpenFileName(self)
@@ -134,19 +143,21 @@ class AnalyzeAdPage(QWidget):
                 QMessageBox.critical(self, "Ошибка при чтении файла",
                                      "Убедитесь, что файл представляет собой текстовый документ")
 
+    def browse_directory(self, label):
+        file = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        if file != "":
+            label.setText(file)
+        self.analysis_check()
+
     def loadFiles(self, browseList):
         file_name = QFileDialog()
         file_name.setFileMode(QFileDialog.ExistingFiles)
         names = file_name.getOpenFileNames(self, "Open files", "C\\Desktop")[0]
         if len(names) != 0:
             browseList.clear()
-        for name in names:
-            browseList.addItem(name)
-
-    def browse_directory(self, label):
-        file = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
-        if file != "":
-            label.setText(file)
+            for name in names:
+                browseList.addItem(name)
+            browseList.setCurrentRow(0)
 
     def update_progress(self, progress):
         self.pageDownloadInfo.setText(progress)
@@ -154,10 +165,20 @@ class AnalyzeAdPage(QWidget):
     def start_analysis(self):
         self.pageDownloadButton.setEnabled(False)
         self.pageCancelButton.setEnabled(True)
+        self.saveToButton.setEnabled(False)
+        self.adLinksBlockBrowse.setEnabled(False)
+        self.adKeywordsBlockBrowse.setEnabled(False)
+        self.adKeywordsBlockText.setReadOnly(True)
+        self.adLinksBlockText.setEnabled(False)
 
     def cancel_analysis(self):
         self.pageDownloadButton.setEnabled(True)
         self.pageCancelButton.setEnabled(False)
+        self.saveToButton.setEnabled(True)
+        self.adLinksBlockBrowse.setEnabled(True)
+        self.adKeywordsBlockBrowse.setEnabled(True)
+        self.adKeywordsBlockText.setReadOnly(False)
+        self.adLinksBlockText.setEnabled(True)
 
     def start_analysis_slot(self, slot):
         self.pageDownloadButton.clicked.connect(slot)
@@ -166,7 +187,7 @@ class AnalyzeAdPage(QWidget):
         self.pageCancelButton.clicked.connect(slot)
 
     def get_links(self):
-        return self.adLinksBlockText.toPlainText().split('\n')
+        return [self.adLinksBlockText.item(i).text() for i in range(self.adLinksBlockText.count())]
 
     def get_keywords(self):
         return [[token for token in tokens] for tokens in self.adKeywordsBlockText.toPlainText().split('\n')]
@@ -174,15 +195,22 @@ class AnalyzeAdPage(QWidget):
     def check_keywords(self):
         return "," not in self.adKeywordsBlockText.toPlainText()
 
-    def check_same_size(self):
-        if len(self.adLinksBlockText.toPlainText().split('\n')) \
-           != len(self.adKeywordsBlockText.toPlainText().split('\n')):
-            return False
-        else:
-            return True
+    def get_save_info_path(self):
+        return self.chosenPathLabel.text()
+
+    def get_save_video_path(self):
+        return self.savePathLabel.text()
+
+    def check_size(self):
+        return self.adLinksBlockText.count() \
+           >= len(self.adKeywordsBlockText.toPlainText().split('\n'))\
+            and self.adLinksBlockText.count() > 0
 
     def check_texts(self):
-        if self.check_keywords() and self.check_same_size():
+        return self.check_keywords() and self.check_size()
+
+    def analysis_check(self):
+        if self.check_texts() and self.chosenPathLabel.text() != "":
             self.pageDownloadButton.setEnabled(True)
         else:
             self.pageDownloadButton.setEnabled(False)

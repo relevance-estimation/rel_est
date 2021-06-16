@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtWidgets import  QDesktopWidget, QApplication, QLabel, QFileDialog,\
-    QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,QVBoxLayout,\
+    QMainWindow, QApplication,QMessageBox, QPushButton, QWidget, QAction, QTabWidget,QVBoxLayout,\
     QTableWidgetItem
 
 from PyQt5.QtCore import QRect, Qt, QAbstractTableModel
@@ -10,6 +10,7 @@ from functools import partial
 
 from relevant_moment import RelevantMoment
 from relevant_moment_result import RelevantMomentResult
+import pickle
 
 import pandas as pd
 
@@ -49,6 +50,9 @@ class App(QMainWindow):
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         self.page = RelevantMoments(self)
+
+        self.page_controller = RelevantMomentsController(self.page)
+
         self.setCentralWidget(self.page)
 
         self.show()
@@ -137,6 +141,46 @@ class RelevantMoments(QWidget):
 
     def get_vid_path(self):
         return self.tab1.nameVid.text()
+
+    def show_error(self, error):
+        QMessageBox.critical(self,"Ошибка", error)
+
+    def launch_fail(self):
+        self.tab1.buttonEdit.setEnabled(False)
+
+    def check_file(self, path):
+        try:
+            with open(path, "rb") as f:
+                f.seek(0)
+                vids = pickle.load(f)
+            return vids
+        except:
+            self.ad_edit_page.show_error("Ошибка при чтении файла")
+            self.ad_edit_page.launch_fail()
+
+class RelevantMomentsController():
+    def __init__(self, relevant_moments_page):
+        self.relevant_moments_page = relevant_moments_page
+        self.signals()
+
+    def signals(self):
+        self.relevant_moments_page.start_analysis_slot(self.analyze)
+
+    def analyze(self):
+        ad_info = self.check_file(self.relevant_moments.get_ad_path())
+        vid_infos = self.check_file(self.relevant_moments.get_vid_path())
+        try:
+            estimate = video_relevance.get_estimate(ad_info, vid_infos, [''])
+        except:
+            self.ad_edit_page.show_error("Ошибка анализа файла")
+            self.ad_edit_page.launch_fail()
+            return
+        df = pd.DataFrame(data=estimate, header=False)
+        df = df.iloc[:, 1:]
+        self.relevant_moments_page.load_data(df)
+        self.relevant_moments_page.launch_success()
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

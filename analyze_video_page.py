@@ -27,7 +27,7 @@ class App(QMainWindow):
         self.show()
 
 
-class AnalyzVideoPage(QWidget):
+class AnalyzeVideoPage(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()

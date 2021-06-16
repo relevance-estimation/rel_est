@@ -27,7 +27,7 @@ class App(QMainWindow):
         self.show()
 
 
-class DownloadAdPage(QWidget):
+class AnalyzeAdPage(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()

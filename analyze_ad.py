@@ -18,13 +18,13 @@ class App(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        self.page = AdPageAnaliz(self)
+        self.page = AdAnalyzePage(self)
         self.setCentralWidget(self.page)
 
         self.show()
 
 
-class AdPageAnaliz(QWidget):
+class AdAnalyzePage(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()
@@ -42,8 +42,8 @@ class AdPageAnaliz(QWidget):
         self.tab2 = DownloadAdPage(self.tabs)
 
         # Add tabs
-        self.tabs.addTab(self.tab1, "Ссылки на рекламу(компьютер)")
-        self.tabs.addTab(self.tab2, "Ссылки на рекламу(интернет)")
+        self.tabs.addTab(self.tab1, "Файлы с компьютера")
+        self.tabs.addTab(self.tab2, "Файлы с Интернета")
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)

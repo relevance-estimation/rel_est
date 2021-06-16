@@ -10,7 +10,8 @@ from download_video_page import DownloadVideoPage
 from relevant_mom import RelevantMoments
 from relevant_video_page import RelevantVideoPage
 from main_menu import MainMenu
-
+from analyz_ad import AdPageAnaliz
+from analyz_video import VidPageAnaliz
 
 
 class PageWindow(QtWidgets.QMainWindow):
@@ -33,8 +34,8 @@ class Window(QtWidgets.QMainWindow):
 
         self.register(MainMenu(self), "main")
         self.register(AdEditPage(self), "adEditPage")
-        self.register(DownloadAdPage(self), "DownloadAdPage")
-        self.register(DownloadVideoPage(self), "DownloadVideoPage")
+        self.register(AdPageAnaliz(self), "AdPageAnaliz")
+        self.register(VidPageAnaliz(self), "VidPageAnaliz")
         self.register(RelevantMoments(self), "RelevantMoments")
         self.register(RelevantVideoPage(self), "RelevantVideoPage")
         self.goto("main")

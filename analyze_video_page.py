@@ -21,13 +21,13 @@ class App(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        self.page = DownloadVideoPage(self)
+        self.page = AnalyzVideoPage(self)
         self.setCentralWidget(self.page)
 
         self.show()
 
 
-class DownloadVideoPage(QWidget):
+class AnalyzVideoPage(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.initUI()

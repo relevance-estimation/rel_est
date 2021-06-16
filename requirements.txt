@@ -1,0 +1,11 @@
+PyQt5
+pandas
+numpy
+youtube_dl
+moviepy
+gensim
+scipy
+pymystem3
+nltk
+ffmpeg
+opencv-python

@@ -65,6 +65,7 @@ class AdEditPage(QWidget):
         if select_file[0] != "":
             self.tab1.pathEdit.clear()
             self.tab1.pathEdit.insert(select_file[0])
+            self.tab2.chosenPathLabel.setText(select_file[0])
             self.tab1.buttonEdit.setEnabled(True)
 
     def launch_success(self):

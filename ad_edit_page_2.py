@@ -3,9 +3,11 @@
 
 import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
-                            QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit)
+                            QPushButton,QFileDialog, QLabel, QHBoxLayout, QSizePolicy, QLineEdit)
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QFont
+from functools import partial
+import pickle
 
 
 class App(QMainWindow):
@@ -58,14 +60,21 @@ class AdEditPage2(QWidget):
 
         self.saveAsButton = QPushButton("Сохранить как...")
         self.saveAsButton.setMaximumWidth(100)
+        self.chosenPathLabel = QLabel("")
+        self.chosenPathLabel.setMaximumWidth(300)
         self.saveAsButtonHbox = QHBoxLayout()
         self.saveAsButtonHbox.addStretch(1)
+
+
+        self.saveAsButtonHbox.addWidget(self.chosenPathLabel)
         self.saveAsButtonHbox.addWidget(self.saveAsButton)
 
         self.adEditBlockVbox.addStretch()
         self.adEditBlockVbox.addLayout(self.saveAsButtonHbox)
         self.adEditBlockVbox.addStretch()
         self.adEditBlockVbox.setSpacing(30)
+
+        self.saveAsButton.clicked.connect(self.read_file)
 
         self.adEditBlock.setLayout(self.adEditBlockVbox)
 
@@ -75,6 +84,13 @@ class AdEditPage2(QWidget):
         self.pageVbox.addLayout(self.pageHbox)
 
         self.setLayout(self.pageVbox)
+
+    def read_file(self):
+        filename = self.chosenPathLabel.text()
+        with open(filename, "rb") as f:
+            vids = pickle.load(f)
+        vids.videos[0].keywords = keywords.split()
+        pickle.dump(vids, filename)
 
 
 if __name__ == '__main__':

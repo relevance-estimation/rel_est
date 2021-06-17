@@ -9,7 +9,7 @@ from PyQt5.QtGui import QFont
 from ad_edit_page_1 import AdEditPage1
 from ad_edit_page_2 import AdEditPage2
 import pickle
-
+import video_relevance
 
 class App(QMainWindow):
     def __init__(self):
@@ -100,7 +100,8 @@ class AdEditPage(QWidget):
         self.tab1.buttonEdit.setEnabled(False)
 
     def save_fail(self):
-        self.tab2.saveAsButton.setEnabled(False)
+        #self.tab2.saveAsButton.setEnabled(False)
+        pass
 
     def get_keywords(self):
         return self.tab2.keywordsEditLine.text()
@@ -140,10 +141,11 @@ class AdEditPageController():
         keywords = self.ad_edit_page.get_keywords()
         self.vids.videos[0].keywords = keywords.split()
         try:
-            pickle.dump(self.vids, self.filename)
+            with open(self.filename, "wb") as f:
+                pickle.dump(self.vids, f)
             self.ad_edit_page.save_success()
         except:
-            self.show_error("Ошибка сохранения")
+            self.ad_edit_page.show_error("Ошибка сохранения")
             self.ad_edit_page.save_fail()
 
 

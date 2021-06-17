@@ -63,6 +63,11 @@ class AdEditPage(QWidget):
         self.tab1.buttonEdit.setEnabled(False)
         self.tab1.buttonoverview.clicked.connect(self.browse_file)
 
+        self.tab2.keywordsEditLine.textChanged.connect(self.make_save_available)
+
+    def make_save_available(self):
+        self.tab2.saveAsButton.setEnabled(True)
+
     def browse_file(self):
             select_file = QFileDialog.getOpenFileName(self)
             if select_file[0] != "":
@@ -74,12 +79,13 @@ class AdEditPage(QWidget):
         self.tabs.setTabEnabled(1, True)
         self.tabs.setCurrentIndex(1)
         self.tab1.buttonEdit.setEnabled(False)
+        self.tab2.saveAsButton.setEnabled(False)
 
     def save_success(self):
         self.tabs.setCurrentIndex(0)
         self.tab2.saveAsButton.setEnabled(False)
         self.tab1.buttonEdit.setEnabled(False)
-
+        self.tab1.pathEdit.clear()
 
     def edit_slot(self, slot):
         self.tab1.buttonEdit.clicked.connect(slot)

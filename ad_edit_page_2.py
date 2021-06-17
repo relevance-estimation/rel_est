@@ -58,7 +58,7 @@ class AdEditPage2(QWidget):
         self.adEditBlockVbox.addStretch()
         self.adEditBlockVbox.addLayout(self.keywordsHbox)
 
-        self.saveAsButton = QPushButton("Сохранить как...")
+        self.saveAsButton = QPushButton("Сохранить")
         self.saveAsButton.setMaximumWidth(100)
         self.chosenPathLabel = QLabel("")
         self.chosenPathLabel.setMaximumWidth(300)
@@ -82,7 +82,6 @@ class AdEditPage2(QWidget):
         self.pageVbox.addLayout(self.pageHbox)
 
         self.setLayout(self.pageVbox)
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

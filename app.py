@@ -1,12 +1,8 @@
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDesktopWidget, QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QDesktopWidget
+
 from ad_edit_page import AdEditPage
-from download_ad_page import DownloadAdPage
-from download_video_page import DownloadVideoPage
-#from analyze_page import AdEditPage
 from relevant_moments_page import RelevantMoments
 from relevant_video_page import RelevantVideoPage
 from main_menu import MainMenu
@@ -14,6 +10,7 @@ from analyze_ad import AdAnalyzePage
 from analyze_video import VidAnalyzePage
 
 from functools import partial
+import video_relevance
 
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):

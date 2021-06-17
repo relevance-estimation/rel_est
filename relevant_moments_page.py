@@ -13,6 +13,7 @@ from relevant_moment_result import RelevantMomentResult
 import pickle
 
 import pandas as pd
+import video_relevance
 
 class PandasModel(QAbstractTableModel):
 
@@ -50,8 +51,9 @@ class App(QMainWindow):
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         self.page = RelevantMoments(self)
+        self.model = video_relevance.Model()
 
-        self.page_controller = RelevantMomentsController(self.page)
+        self.page_controller = RelevantMomentsController(self.page, self.model)
 
         self.setCentralWidget(self.page)
 
@@ -101,7 +103,6 @@ class RelevantMoments(QWidget):
         self.tab1.buttonVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathVid))
         self.tab1.buttonRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathRec))
 
-        self.tab1.buttonEdit.clicked.connect(self.launch_success)
         df = pd.DataFrame(data=[[1,2,3,4,5]])
         self.load_data(df)
 
@@ -131,16 +132,16 @@ class RelevantMoments(QWidget):
         self.tab1.buttonEdit.clicked.connect(slot)
 
     def get_ad_info_path(self):
-        return self.tab1.nameInfoRec.text()
+        return self.tab1.pathInfoRec.text()
 
     def get_vid_info_path(self):
-        return self.tab1.nameInfoVid.text()
+        return self.tab1.pathInfoVid.text()
 
     def get_ad_path(self):
-        return self.tab1.nameRec.text()
+        return self.tab1.pathRec.text()
 
     def get_vid_path(self):
-        return self.tab1.nameVid.text()
+        return self.tab1.pathVid.text()
 
     def show_error(self, error):
         QMessageBox.critical(self,"Ошибка", error)
@@ -148,39 +149,44 @@ class RelevantMoments(QWidget):
     def launch_fail(self):
         self.tab1.buttonEdit.setEnabled(False)
 
-    def check_file(self, path):
-        try:
-            with open(path, "rb") as f:
-                f.seek(0)
-                vids = pickle.load(f)
-            return vids
-        except:
-            self.ad_edit_page.show_error("Ошибка при чтении файла")
-            self.ad_edit_page.launch_fail()
-
 class RelevantMomentsController():
-    def __init__(self, relevant_moments_page):
+    def __init__(self, relevant_moments_page, model):
         self.relevant_moments_page = relevant_moments_page
         self.signals()
+        self.model = model
 
     def signals(self):
         self.relevant_moments_page.start_analysis_slot(self.analyze)
 
     def analyze(self):
-        ad_info = self.check_file(self.relevant_moments.get_ad_path())
-        vid_infos = self.check_file(self.relevant_moments.get_vid_path())
-        try:
-            estimate = video_relevance.get_estimate(ad_info, vid_infos, [''])
-        except:
-            self.ad_edit_page.show_error("Ошибка анализа файла")
-            self.ad_edit_page.launch_fail()
+        ad_info = self.check_file(self.relevant_moments_page.get_ad_info_path())
+        if ad_info == False:
             return
-        df = pd.DataFrame(data=estimate, header=False)
+        vid_infos = self.check_file(self.relevant_moments_page.get_vid_info_path())
+        if vid_infos == False:
+            return
+        try:
+            estimate = self.model.get_estimate(ad_info, vid_infos, ['' for video in vid_infos])
+        except:
+            self.relevant_moments_page.show_error("Ошибка анализа файла")
+            self.relevant_moments_page.launch_fail()
+            return
+        df = pd.DataFrame(data=estimate[0], header=False)
         df = df.iloc[:, 1:]
         self.relevant_moments_page.load_data(df)
         self.relevant_moments_page.launch_success()
 
-
+    def check_file(self, path):
+        print("path:", path)
+        try:
+            with open(path, "rb") as f:
+                f.seek(0)
+                vids = pickle.load(f)
+            return vids.videos
+        except:
+            self.relevant_moments_page.show_error("Ошибка при чтении файла")
+            self.relevant_moments_page.launch_fail()
+            return False
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

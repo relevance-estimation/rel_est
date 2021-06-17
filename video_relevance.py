@@ -31,10 +31,8 @@ from colorthief import ColorThief
 import time
 
 import nltk
-nltk.download('stopwords')
 
 from nltk.corpus import stopwords
-russian_stopwords = stopwords.words("russian")
 
 import subprocess
 import pickle
@@ -52,6 +50,9 @@ class Videos:
         self.videos = videos
 
 class Model:
+    nltk.download('stopwords')
+    russian_stopwords = stopwords.words("russian")
+
     def __init__(self):
         # !wget https://alphacephei.com/vosk/models/vosk-model-small-ru-0.15.zip
         # !unzip vosk-model-small-ru-0.15.zip
@@ -96,6 +97,7 @@ class Model:
                 word_analysis = self.__mystem.analyze(word)[0]
                 error = False
             except BrokenPipeError:
+                print("here")
                 self.__mystem = Mystem()
                 error = True
         try:
@@ -151,7 +153,7 @@ class Model:
 
     def __remove_bad_tokens(self, tokens):
         return [token for token in tokens if self.__is_good_word(token)
-                and token not in russian_stopwords and len(token) > 1]
+                and token not in self.russian_stopwords and len(token) > 1]
 
     def __get_text(self, filename):
         text = self.__extract_text(filename)
@@ -424,16 +426,19 @@ class Model:
         return estimate_list
 
     def get_estimate(self, ads, videos, video_names):
+        print("started")
         ad_words_v_lists = [self.__tokens_to_vec(set(tokens)) for tokens in [ad.text for ad in ads]]
         mid_rel_text_dict = {i: video.text for i, video in enumerate(videos)}
+        print("started-1")
         words = list(
             set([token for tokens in mid_rel_text_dict.values() for token in tokens if self.__vector_value(token)[0]]))
+        print("started-2")
         vid_words_v_list = [self.__vector_value(token)[1:][0] for token in words]
         vid_tree = spatial.cKDTree(vid_words_v_list)
         word_id_values = self.__make_dict_of_words(mid_rel_text_dict)
         mid_rel_freq_dict = self.__get_freq_dict(mid_rel_text_dict)
         ad_non_vect_words = [[token for token in tokens if self.__is_good_word(token) and not self.__vector_value(token)[0]
-                              and token not in russian_stopwords and len(token) > 1]
+                              and token not in self.russian_stopwords and len(token) > 1]
                              for tokens in [ad.text for ad in ads]]
 
         ad_colors_v_lists = [colors_v for colors_v in [ad.top_colors for ad in ads]]
@@ -444,10 +449,13 @@ class Model:
         color_id_values = self.__make_dict_of_words(mid_rel_colors_dict)
 
         estimations_list = []
+
         for i in range(len(ad_words_v_lists)):
+            print("getting text features")
             text_estimate = self.__get_text_estimate(ad_non_vect_words[i], ad_words_v_lists[i], vid_tree, vid_words_v_list,
                                               word_id_values,
                                               words, mid_rel_freq_dict, mid_rel_text_dict)
+            print("getting color features")
             color_estimate = self.__get_color_estimate(ad_colors_v_lists[i], vid_color_tree, vid_colors_v_list,
                                                 color_id_values,
                                                 vid_colors)

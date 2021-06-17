@@ -130,7 +130,7 @@ class AdEditPageController():
         self.filename = filename
         self.vids = vids
         try:
-            keywords="".join(vids.videos[0].keywords)
+            keywords = " ".join(vids.videos[0].keywords)
             self.ad_edit_page.put_keywords(keywords)
             self.ad_edit_page.launch_success()
         except:

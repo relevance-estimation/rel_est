@@ -10,4 +10,4 @@ nltk
 ffmpeg
 opencv-python
 vosk
-cmake
+colorthief

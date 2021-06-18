@@ -44,7 +44,7 @@ class RelevantMoment(QWidget):
         #self.namewindow.setFixedHeight()
 
         self.nameInfoVid=QLabel('Инфо-видео')
-        self.nameInfoRec=QLabel('Инфо-реклама')
+        self.nameInfoRec=QLabel('Инфо-видео')
         self.nameVid=QLabel('Видео')
         self.nameRec=QLabel('Реклама')
 

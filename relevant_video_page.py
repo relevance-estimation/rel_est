@@ -3,14 +3,16 @@
 
 import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
-                            QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QFileDialog, QTableWidgetItem)
+                            QPushButton,QMessageBox, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QFileDialog, QTableWidgetItem)
 from PyQt5.QtCore import QRect, Qt, QAbstractTableModel
 from PyQt5.QtGui import QFont
 from relevant_video import RelevantVideo
 from relevant_video_result_page import RelevantVideoResultPage
+import pickle
 
 from functools import partial
 import pandas as pd
+import video_relevance
 
 class PandasModel(QAbstractTableModel):
 
@@ -48,6 +50,10 @@ class App(QMainWindow):
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         self.page = RelevantVideoPage(self)
+        self.model = video_relevance.Model()
+
+        self.page_controller = RelevantVideosController(self.page, self.model)
+
         self.setCentralWidget(self.page)
 
         self.show()
@@ -113,6 +119,7 @@ class RelevantVideoPage(QWidget):
         for name in names:
             browseList.addItem(name)
 
+
     def set_table(self, index):
         model = PandasModel(self.tables[index])
         self.tab2.table.setModel(model)
@@ -123,6 +130,9 @@ class RelevantVideoPage(QWidget):
 
     def clear_tables(self):
         self.tables = []
+
+    def start_analysis_slot(self, slot):
+        self.tab1.buttonEdit.clicked.connect(slot)
 
     def load_data(self, df_list):
         self.clear_tables()
@@ -145,6 +155,12 @@ class RelevantVideoPage(QWidget):
 
         self.tab2.listWidget.setCurrentRow(0)
 
+    def get_ad_info_path(self):
+        return self.tab1.nameRec.selectedItems()
+
+    def get_vid_info_path(self):
+        return self.tab1.nameVid.selectedItems()
+
     def start_analysis_slot(self, slot):
         self.tab1.buttonEdit.clicked.connect(slot)
 
@@ -153,6 +169,60 @@ class RelevantVideoPage(QWidget):
 
     def get_vids(self):
         return [self.tab1.pathVid.item(i).text() for i in range(self.tab1.pathVid.count())]
+
+    def launch_fail(self):
+        self.tab1.buttonEdit.setEnabled(False)
+
+    def show_error(self, error):
+        QMessageBox.critical(self,"Ошибка", error)
+
+class RelevantVideosController():
+    def __init__(self, relevant_video_page, model):
+        self.relevant_video_page = relevant_video_page
+        self.signals()
+        self.model = model
+
+    def signals(self):
+        self.relevant_video_page.start_analysis_slot(self.analyze)
+
+    def analyze(self):
+        estimates =[]
+        ad_info = self.check_files(self.relevant_video_page.get_ads())
+        if ad_info == False:
+            return
+        vid_infos = self.check_files(self.relevant_video_page.get_vids())
+        if vid_infos == False:
+            return
+        try:
+            for i in range(len(ad_info)):
+                estimate = self.model.get_relevant_videos(ad_info[i], vid_infos[i], ['' for video in vid_infos])
+                estimates.append(estimate)
+        except:
+            self.relevant_video_page.show_error("Ошибка анализа файла")
+            self.relevant_video_page.launch_fail()
+            return
+        df_list=[]
+        for res in estimates:
+            df = pd.DataFrame(data=res)
+            df_list.append(df)
+
+        self.relevant_video_page.load_data(df_list)
+        self.relevant_video_page.launch_success()
+
+
+    def check_files(self,path_list):
+        vids_list =[]
+        try:
+            for path in path_list:
+                with open(path, "rb") as f:
+                    f.seek(0)
+                    vids = pickle.load(f)
+                vids_list.append(vids.videos)
+            return vids_list
+        except:
+            self.relevant_video_page.show_error("Ошибка при чтении файла")
+            self.relevant_video_page.launch_fail()
+            return False
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

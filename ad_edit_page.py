@@ -82,7 +82,7 @@ class AdEditPage(QWidget):
         self.tab2.saveAsButton.setEnabled(False)
 
     def save_success(self):
-        self.tabs.setCurrentIndex(0)
+       # self.tabs.setCurrentIndex(0)
         self.tab2.saveAsButton.setEnabled(False)
         self.tab1.buttonEdit.setEnabled(False)
         self.tab1.pathEdit.clear()
@@ -118,9 +118,13 @@ class AdEditPageController():
     def __init__(self, ad_edit_page):
         self.ad_edit_page = ad_edit_page
         self.signals()
+        self.signals2()
+
 
     def signals(self):
         self.ad_edit_page.edit_slot(self.check_file)
+
+    def signals2(self):
         self.ad_edit_page.save_slot(self.save_keywords)
 
     def check_file(self):
@@ -144,8 +148,14 @@ class AdEditPageController():
             self.ad_edit_page.launch_fail()
 
     def save_keywords(self):
-        keywords = self.ad_edit_page.get_keywords()
-        self.vids.videos[0].keywords = keywords.split()
+        try:
+            keywords = self.ad_edit_page.get_keywords()
+        except:
+            self.show_error("Ошибка получения слов")
+        try:
+            self.vids.videos[0].keywords = keywords.split()
+        except:
+            self.show_error("Ошибка ввода слов")
         try:
             with open(self.filename, "wb") as f:
                 pickle.dump(self.vids, f)

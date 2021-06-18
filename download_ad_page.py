@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-
+import os
+import youtube_dl
 import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
                             QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QTextEdit, QFileDialog,
@@ -157,6 +158,15 @@ class DownloadAdPage(QWidget):
                 QMessageBox.critical(self, "Ошибка при чтении файла",
                                      "Убедитесь, что файл представляет собой текстовый документ")
 
+    def download_vid(filepath, link):
+        link_video = [link]
+        ydl_opts = {'format': 'best[height<=720]',
+                    'outtmpl': os.path.join(filepath, '%(title)s'),
+                    'sleep_interval': 30,
+                    'max_sleep_interval': 40
+                    }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            ydl.download(link_video)
 
     def browse_directory(self, label):
         file = str(QFileDialog.getExistingDirectory(self, "Select Directory"))

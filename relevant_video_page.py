@@ -186,31 +186,31 @@ class RelevantVideosController():
         self.relevant_video_page.start_analysis_slot(self.analyze)
 
     def analyze(self):
-        estimates =[]
-        ad_info = self.check_files(self.relevant_video_page.get_ads())
-        if ad_info == False:
+
+        ad_infos = self.check_files(self.relevant_video_page.get_ads())
+        ad_infos = [info for ad_info in ad_infos for info in ad_info]
+        if ad_infos == False:
             return
         vid_infos = self.check_files(self.relevant_video_page.get_vids())
+        vid_filenames = []
+        for i, filename in enumerate(self.relevant_video_page.get_vids()):
+            for k in range(len(vid_infos[i])):
+                vid_filenames.append(filename)
+        vid_infos = [info for vid_info in vid_infos for info in vid_info]
         if vid_infos == False:
             return
         try:
-            for i in range(len(ad_info)):
-                estimate = self.model.get_relevant_videos(ad_info[i], vid_infos[i], ['' for video in vid_infos])
-                estimates.append(estimate)
+                estimate = self.model.get_relevant_videos(ad_infos, vid_infos, vid_filenames)
         except:
             self.relevant_video_page.show_error("Ошибка анализа файла")
             self.relevant_video_page.launch_fail()
             return
         df_list=[]
-        for res in estimates:
+        for res in estimate:
             df = pd.DataFrame(data=res)
             df_list.append(df)
-
         self.relevant_video_page.load_data(df_list)
         self.relevant_video_page.launch_success()
-
-
-
 
     def check_files(self,path_list):
         vids_list =[]

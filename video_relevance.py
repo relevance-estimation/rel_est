@@ -23,7 +23,7 @@ import gensim
 import scipy.spatial as spatial
 
 import json
-from pymystem3 import Mystem
+import pymorphy2
 
 import cv2
 from colorthief import ColorThief
@@ -64,10 +64,10 @@ class Model:
         # загрузка модели word2vec
         self.__wv = KeyedVectors.load_word2vec_format('model.bin', binary=True)
 
-        self.__mystem_to_vec = {'A': 'ADJ', 'ADV': 'ADV', 'ADVPRO': 'x', 'ANUM': 'ADJ', 'APRO': 'x', 'COM': 'x',
-                         'CONJ': 'x', 'INTI': 'x', 'NUM': 'NUM', 'PART': 'x', 'PR': 'x', 'S': 'NOUN',
-                         'SPRO': 'x', 'V': 'VERB'}
-        self.__mystem = Mystem()
+        self.__morphy_to_vec = {'ADJF': 'ADJ', 'ADJS': 'ADJ', 'COMP': 'ADJ', 'ADVB': 'ADV',
+                                'NUMR': 'NUM', 'NOUN': 'NOUN', 'VERB': 'VERB', 'INFN': 'VERB', 
+                                'PRTF': 'VERB', 'PRTS':'VERB', 'GRND': 'VERB'}
+        self.__morphy = pymorphy2.MorphAnalyzer()
 
     def __chunk_video(self, from_filepath, start_time, end_time, to_filepath):
         ffmpeg_extract_subclip(from_filepath, start_time, end_time, targetname=to_filepath)
@@ -86,70 +86,32 @@ class Model:
         return eval(rec.FinalResult())['text']
 
     # TEXT PROCESSING
-
     def __vector_value(self, word):
         part = 'unknown'
         word_found = True
 
-        error = True
-        while error:
-            try:
-                word_analysis = self.__mystem.analyze(word)[0]
-                error = False
-            except BrokenPipeError:
-                print("here")
-                self.__mystem = Mystem()
-                error = True
-        try:
-            part = word_analysis[u'analysis'][0][u'gr'].split(',')[0]
-            try:
-                part = part.split('=')[0]
-                part = self.__mystem_to_vec[part]
-                value = self.__wv[word + u'_' + part]
-                return word_found, value
-            except:
-                part = word_analysis[u'analysis'][0][u'gr'].split(',')[0]
-                part = self.__mystem_to_vec[part]
-                request = word + u'_' + part
-                value = self.__wv[request]
-                return word_found, value
-        except:
+        word_analysis = self.__morphy.parse(word)[0]
+        part = word_analysis.tag.POS
+        if part is None or part not in self.__morphy_to_vec:
             word_found = False
             return word_found, [int(0) for i in range(300)]
-
-    def __safe_mystem_lemmatize(self, text):
-        error = True
-        while error:
-            try:
-                return self.__mystem.lemmatize(text)
-            except BrokenPipeError:
-                self.__mystem = Mystem()
-                continue
+        else:
+            part = self.__morphy_to_vec[part]
+            if self.__wv.has_index_for(word + u'_' + part):
+                value = self.__wv[word + u'_' + part]
+            else:
+                word_found = False
+                value = [int(0) for i in range(300)]
+            return word_found, value
 
     def __lemmatize(self, text):
-        return [lemma for lemma in self.__safe_mystem_lemmatize(text)
-                if lemma.strip() != '']
+        return [self.__morphy.parse(lemma)[0].normal_form for lemma
+                in self.__decode_text(text).split()]
 
     def __is_good_word(self, word):
-        error = True
-        while error:
-            try:
-                word_analysis = self.__mystem.analyze(word)[0]
-                error = False
-            except BrokenPipeError:
-                self.__mystem = Mystem()
-                error = True
-        try:
-            part = word_analysis[u'analysis'][0][u'gr'].split(',')[0]
-        except:
-            return False
-        if '=' not in part and part in self.__mystem_to_vec:
-            return self.__mystem_to_vec[part] != 'x'
-        if '=' in part:
-            part = part.split('=')[0]
-            if part in self.__mystem_to_vec:
-                return self.__mystem_to_vec[part] != 'x'
-        return False
+        word_analysis = self.__morphy.parse(word)[0]
+        part = word_analysis.tag.POS
+        return part in self.__morphy_to_vec
 
     def __remove_bad_tokens(self, tokens):
         return [token for token in tokens if self.__is_good_word(token)
@@ -426,13 +388,10 @@ class Model:
         return estimate_list
 
     def get_estimate(self, ads, videos, video_names):
-        print("started")
         ad_words_v_lists = [self.__tokens_to_vec(set(tokens)) for tokens in [ad.text for ad in ads]]
         mid_rel_text_dict = {i: video.text for i, video in enumerate(videos)}
-        print("started-1")
         words = list(
             set([token for tokens in mid_rel_text_dict.values() for token in tokens if self.__vector_value(token)[0]]))
-        print("started-2")
         vid_words_v_list = [self.__vector_value(token)[1:][0] for token in words]
         vid_tree = spatial.cKDTree(vid_words_v_list)
         word_id_values = self.__make_dict_of_words(mid_rel_text_dict)
@@ -451,11 +410,9 @@ class Model:
         estimations_list = []
 
         for i in range(len(ad_words_v_lists)):
-            print("getting text features")
             text_estimate = self.__get_text_estimate(ad_non_vect_words[i], ad_words_v_lists[i], vid_tree, vid_words_v_list,
                                               word_id_values,
                                               words, mid_rel_freq_dict, mid_rel_text_dict)
-            print("getting color features")
             color_estimate = self.__get_color_estimate(ad_colors_v_lists[i], vid_color_tree, vid_colors_v_list,
                                                 color_id_values,
                                                 vid_colors)

@@ -5,7 +5,7 @@ youtube_dl
 moviepy
 gensim
 scipy
-pymystem3
+pymorphy2
 nltk
 ffmpeg
 opencv-python

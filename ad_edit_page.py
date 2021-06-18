@@ -82,7 +82,7 @@ class AdEditPage(QWidget):
         self.tab2.saveAsButton.setEnabled(False)
 
     def save_success(self):
-       # self.tabs.setCurrentIndex(0)
+        self.tabs.setCurrentIndex(0)
         self.tab2.saveAsButton.setEnabled(False)
         self.tab1.buttonEdit.setEnabled(False)
         self.tab1.pathEdit.clear()
@@ -118,13 +118,10 @@ class AdEditPageController():
     def __init__(self, ad_edit_page):
         self.ad_edit_page = ad_edit_page
         self.signals()
-        self.signals2()
 
 
     def signals(self):
         self.ad_edit_page.edit_slot(self.check_file)
-
-    def signals2(self):
         self.ad_edit_page.save_slot(self.save_keywords)
 
     def check_file(self):

@@ -93,15 +93,11 @@ class RelevantMoments(QWidget):
 
         self.tab1.pathInfoVid.setReadOnly(True)
         self.tab1.pathInfoRec.setReadOnly(True)
-        self.tab1.pathVid.setReadOnly(True)
-        self.tab1.pathRec.setReadOnly(True)
 
         self.tab1.buttonEdit.setEnabled(False)
 
         self.tab1.buttonInfoVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathInfoVid))
         self.tab1.buttonInfoRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathInfoRec))
-        self.tab1.buttonVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathVid))
-        self.tab1.buttonRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathRec))
 
         df = pd.DataFrame(data=[[1,2,3,4,5]])
         self.load_data(df)
@@ -119,7 +115,11 @@ class RelevantMoments(QWidget):
             browseLabel.insert(select_file[0])
 
     def load_data(self, df):
-        df.columns = ["Фрагмент", "Тип релевантности", "Общая оценка", "Текст", "Цвета"]
+        columns = ["Фрагмент", "Тип релевантности", "Общая оценка", "Текст", "Цвета"]
+        if df.shape[0] == 0:
+            df = pd.DataFrame(columns=columns)
+        else:
+            df.columns = columns
         self.tab2.table.setModel(PandasModel(df))
 
     def launch_success(self):
@@ -171,13 +171,14 @@ class RelevantMomentsController():
             self.relevant_moments_page.show_error("Ошибка анализа файла")
             self.relevant_moments_page.launch_fail()
             return
-        df = pd.DataFrame(data=estimate[0], header=False)
-        df = df.iloc[:, 1:]
+        df = pd.DataFrame(data=estimate[0])
+        if df.shape[0] != 0:
+            df = df.iloc[:, 1:]
+
         self.relevant_moments_page.load_data(df)
         self.relevant_moments_page.launch_success()
 
     def check_file(self, path):
-        print("path:", path)
         try:
             with open(path, "rb") as f:
                 f.seek(0)

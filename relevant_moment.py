@@ -50,13 +50,9 @@ class RelevantMoment(QWidget):
 
         self.buttonInfoVid = QPushButton('Обзор', self)
         self.buttonInfoRec = QPushButton('Обзор', self)
-        self.buttonVid = QPushButton('Обзор', self)
-        self.buttonRec = QPushButton('Обзор', self)
 
         self.pathInfoVid = QLineEdit()
         self.pathInfoRec = QLineEdit()
-        self.pathVid = QLineEdit()
-        self.pathRec = QLineEdit()
 
         self.buttonEdit= QPushButton('Запуск', self)
 
@@ -72,21 +68,15 @@ class RelevantMoment(QWidget):
 
         grid.addWidget(self.nameInfoVid, 1, 0)
         grid.addWidget(self.nameInfoRec, 2, 0)
-        grid.addWidget(self.nameVid, 3, 0)
-        grid.addWidget(self.nameRec, 4, 0)
 
         grid.addWidget(self.pathInfoVid,1,1)
         grid.addWidget(self.pathInfoRec,2,1)
-        grid.addWidget(self.pathVid,3,1)
-        grid.addWidget(self.pathRec,4,1)
 
         grid.addWidget(self.buttonInfoVid, 1 , 2)
         grid.addWidget(self.buttonInfoRec, 2 , 2)
-        grid.addWidget(self.buttonVid, 3 , 2)
-        grid.addWidget(self.buttonRec, 4 , 2)
 
 
-        grid.addWidget(self.buttonEdit, 5 , 2)
+        grid.addWidget(self.buttonEdit, 3 , 2)
 
 
         self.adEditBlock.setLayout(grid)

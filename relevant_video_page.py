@@ -210,6 +210,8 @@ class RelevantVideosController():
         self.relevant_video_page.launch_success()
 
 
+
+
     def check_files(self,path_list):
         vids_list =[]
         try:

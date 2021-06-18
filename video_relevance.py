@@ -420,3 +420,23 @@ class Model:
             estimations_list.append(
                 self.__get_one_ad_estimate(text_estimate, color_estimate, high_rel_ids, video_names, videos))
         return estimations_list
+
+    def get_relevant_videos(self, ads, videos, video_names):
+        res = self.get_estimate(ads, videos, video_names)
+        vid_lists = []
+        for rel_est in res:
+            vid_dict = dict()
+            #заполнить vid_dict через rel_est
+            for fragment_info in rel_est:
+                path = fragment_info[0]
+                if path not in vid_dict:
+                    vid_dict[path] = fragment_info
+                else:
+                    if vid_dict[path][2] == 'mid_rel' and fragment_info[2] == 'high_rel':
+                        vid_dict[path] = fragment_info
+                    elif vid_dict[path][2] == fragment_info[2] and fragment_info[3] > vid_dict[path][3]:
+                        vid_dict[path] = fragment_info
+            vid_list = vid_dict.values()
+            vid_list = sorted(vid_list, key=lambda x: x[3], reverse=True)
+            vid_lists.append(vid_list)
+        return vid_lists

@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QA
                             QMessageBox, QListWidget)
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QFont, QTextOption
-
 from functools import partial
+from PyQt5 import QtCore
 
 import video_relevance
 
@@ -238,6 +238,14 @@ class AnalyzeAdPageController:
             self.path_list = path_list
             self.keywords_list = keywords_list
             self.save_to_path = save_to_path
+            self.thread = QtCore.QThread()
+            self.thread.moveToThread(self.start_analysis)
+            self.signals()
+
+        def signals(self):
+            self.AnalyzeAdPage.pageDownloadButton(self.thread.start())
+            self.AnalyzeAdPage.pageCancelButton(self.thread.quit())
+
 
         def update_progress(self, msg):
             self.analyze_ad_page.update_progress("{}/{}: {}".format(self.cur_vid_id, self.total_num, msg))
@@ -253,11 +261,6 @@ class AnalyzeAdPageController:
                 except Exception as e:
                     self.page.show_error("Ошибка обработки файла {}: " + str(e))
 
-    def start_analysis(self):
-
-
-    def cancel_analysis(self):
-        pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

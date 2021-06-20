@@ -325,9 +325,7 @@ class Model:
                             words, mid_rel_freq_dict, mid_rel_text_dict):
         vect_dict = self.__mid_rel_vid_text_dict_vect(ad_words_v_list, vid_tree, vid_words_v_list, word_id_values,
                                                       words, mid_rel_freq_dict)
-        print(vect_dict)
         non_vect_dict = self.__mid_rel_vid_text_dict_non_vect(ad_words, word_id_values, mid_rel_freq_dict)
-        print(non_vect_dict)
         final_dict = self.__get_mid_rel_vid_text_dict(vect_dict, non_vect_dict, mid_rel_text_dict)
         final_dict = {key: value for key, value in final_dict.items() if value > 0}
         return final_dict

@@ -12,6 +12,9 @@ from PyQt5 import QtCore
 
 import video_relevance
 
+
+import video_relevance
+
 class App(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -24,6 +27,13 @@ class App(QMainWindow):
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         self.page = AnalyzeAdPage(self)
+
+        self.model = video_relevance.Model()
+
+
+        self.page_controller = AnalyzeAdPageController(self.page, self.model)
+
+
         self.setCentralWidget(self.page)
 
         self.show()

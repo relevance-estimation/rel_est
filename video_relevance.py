@@ -325,7 +325,9 @@ class Model:
                             words, mid_rel_freq_dict, mid_rel_text_dict):
         vect_dict = self.__mid_rel_vid_text_dict_vect(ad_words_v_list, vid_tree, vid_words_v_list, word_id_values,
                                                       words, mid_rel_freq_dict)
+        print(vect_dict)
         non_vect_dict = self.__mid_rel_vid_text_dict_non_vect(ad_words, word_id_values, mid_rel_freq_dict)
+        print(non_vect_dict)
         final_dict = self.__get_mid_rel_vid_text_dict(vect_dict, non_vect_dict, mid_rel_text_dict)
         final_dict = {key: value for key, value in final_dict.items() if value > 0}
         return final_dict
@@ -388,7 +390,7 @@ class Model:
         return estimate_list
 
     def get_estimate(self, ads, videos, video_names):
-        ad_words_v_lists = [self.__tokens_to_vec(set(tokens)) for tokens in [ad.text for ad in ads]]
+        ad_words_v_lists = [self.__tokens_to_vec(set(tokens)) for tokens in [ad.text + ad.keywords for ad in ads]]
         mid_rel_text_dict = {i: video.text for i, video in enumerate(videos)}
         words = list(
             set([token for tokens in mid_rel_text_dict.values() for token in tokens if self.__vector_value(token)[0]]))
@@ -396,10 +398,8 @@ class Model:
         vid_tree = spatial.cKDTree(vid_words_v_list)
         word_id_values = self.__make_dict_of_words(mid_rel_text_dict)
         mid_rel_freq_dict = self.__get_freq_dict(mid_rel_text_dict)
-        ad_non_vect_words = [[token for token in tokens if self.__is_good_word(token) and not self.__vector_value(token)[0]
-                              and token not in self.russian_stopwords and len(token) > 1]
-                             for tokens in [ad.text for ad in ads]]
-
+        ad_non_vect_words = [set([token for token in tokens if not self.__vector_value(token)[0]])
+                             for tokens in [ad.text + ad.keywords for ad in ads]]
         ad_colors_v_lists = [colors_v for colors_v in [ad.top_colors for ad in ads]]
         mid_rel_colors_dict = {i: video.top_colors for i, video in enumerate(videos)}
         vid_colors = list(set([color for colors in mid_rel_colors_dict.values() for color in colors]))

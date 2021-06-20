@@ -95,15 +95,13 @@ class RelevantVideoPage(QWidget):
         self.tab1.buttonVid.clicked.connect(partial(self.browse_and_check, self.tab1.pathVid))
         self.tab1.buttonRec.clicked.connect(partial(self.browse_and_check, self.tab1.pathRec))
 
-        self.tab1.buttonEdit.clicked.connect(self.launch_success)
-
         self.tab2.listWidget.itemSelectionChanged.connect(self.selectAd)
-        df1 = pd.DataFrame(data=[[1,2,3,4,5,6], [1,2,3,4,5,6],[1,2,3,4,5,6]])
-        df2 = pd.DataFrame(data=[["a", "b", "c", "d", "e", "f"], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]])
-        df3 = pd.DataFrame(data=[[1000, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]])
-        self.load_df(df1)
-        self.load_df(df2)
-        self.load_df(df3)
+        #df1 = pd.DataFrame(data=[[1,2,3,4,5,6], [1,2,3,4,5,6],[1,2,3,4,5,6]])
+        #df2 = pd.DataFrame(data=[["a", "b", "c", "d", "e", "f"], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]])
+        #df3 = pd.DataFrame(data=[[1000, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]])
+        #self.load_df(df1)
+        #self.load_df(df2)
+        #self.load_df(df3)
 
     def browse_and_check(self, browseList):
         self.loadFiles(browseList)
@@ -125,7 +123,11 @@ class RelevantVideoPage(QWidget):
         self.tab2.table.setModel(model)
 
     def load_df(self, df):
-        df.columns = ["Имя файла", "Фрагмент", "Тип релевантности", "Общая оценка", "Текст", "Цвета"]
+        columns = ["Имя файла", "Фрагмент", "Тип релевантности", "Общая оценка", "Текст", "Цвета"]
+        if df.shape[0] == 0:
+            df = pd.DataFrame(columns=columns)
+        else:
+            df.columns = columns
         self.tables.append(df)
 
     def clear_tables(self):
@@ -186,19 +188,18 @@ class RelevantVideosController():
         self.relevant_video_page.start_analysis_slot(self.analyze)
 
     def analyze(self):
-
         ad_infos = self.check_files(self.relevant_video_page.get_ads())
-        ad_infos = [info for ad_info in ad_infos for info in ad_info]
         if ad_infos == False:
             return
+        ad_infos = [info for ad_info in ad_infos for info in ad_info]
         vid_infos = self.check_files(self.relevant_video_page.get_vids())
+        if vid_infos == False:
+            return
         vid_filenames = []
         for i, filename in enumerate(self.relevant_video_page.get_vids()):
             for k in range(len(vid_infos[i])):
-                vid_filenames.append(filename)
+                vid_filenames.append(filename.split("/")[-1])
         vid_infos = [info for vid_info in vid_infos for info in vid_info]
-        if vid_infos == False:
-            return
         try:
                 estimate = self.model.get_relevant_videos(ad_infos, vid_infos, vid_filenames)
         except:

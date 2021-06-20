@@ -10,6 +10,8 @@ from PyQt5.QtGui import QFont, QTextOption
 
 from functools import partial
 
+import video_relevance
+
 class App(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -21,7 +23,7 @@ class App(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        self.page = DownloadAdPage(self)
+        self.page = AnalyzeAdPage(self)
         self.setCentralWidget(self.page)
 
         self.show()
@@ -186,20 +188,20 @@ class AnalyzeAdPage(QWidget):
     def cancel_slot(self, slot):
         self.pageCancelButton.clicked.connect(slot)
 
-    def get_links(self):
+    def get_paths(self):
         return [self.adLinksBlockText.item(i).text() for i in range(self.adLinksBlockText.count())]
 
     def get_keywords(self):
-        return [[token for token in tokens] for tokens in self.adKeywordsBlockText.toPlainText().split('\n')]
+        keywords = [[token for token in tokens] for tokens in self.adKeywordsBlockText.toPlainText().split('\n')]
+        for i in range(self.adKeywordsBlockText.count(), self.adLinksBlockText.count() + 1):
+            keywords.append([])
+        return keywords
 
     def check_keywords(self):
         return "," not in self.adKeywordsBlockText.toPlainText()
 
     def get_save_info_path(self):
         return self.chosenPathLabel.text()
-
-    def get_save_video_path(self):
-        return self.savePathLabel.text()
 
     def check_size(self):
         return self.adLinksBlockText.count() \
@@ -214,6 +216,48 @@ class AnalyzeAdPage(QWidget):
             self.pageDownloadButton.setEnabled(True)
         else:
             self.pageDownloadButton.setEnabled(False)
+
+    def show_error(self, error):
+        QMessageBox.critical(self,"Ошибка", error)
+
+
+class AnalyzeAdPageController:
+    def __init__(self, analyze_ad_page: AnalyzeAdPage, model: video_relevance.Model):
+        self.analyze_ad_page = analyze_ad_page
+        self.model = model
+
+    def signals(self):
+        self.analyze_ad_page.start_analysis_slot(self.start_analysis)
+        self.analyze_ad_page.cancel_slot(self.cancel_analysis)
+
+    class Analyzer:
+        def __init__(self, page: AnalyzeAdPage, model: video_relevance.Model, path_list: list,
+                     keywords_list: list, save_to_path: str):
+            self.page = page
+            self.model = model
+            self.path_list = path_list
+            self.keywords_list = keywords_list
+            self.save_to_path = save_to_path
+
+        def update_progress(self, msg):
+            self.analyze_ad_page.update_progress("{}/{}: {}".format(self.cur_vid_id, self.total_num, msg))
+
+        def start_analysis(self):
+            for i, info in enumerate(zip(self.path_list, self.keywords_list)):
+                filename = info[0]
+                name = info[0].split("/")[-1]
+                keywords = info[1]
+                try:
+                    self.model.save_ad_info(filename, self.save_to_path + "/" + name,
+                                            keywords, self.update_progress)
+                except Exception as e:
+                    self.page.show_error("Ошибка обработки файла {}: " + str(e))
+
+    def start_analysis(self):
+
+
+    def cancel_analysis(self):
+        pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

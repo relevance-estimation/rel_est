@@ -45,9 +45,16 @@ class Video:
         self.top_colors = top_colors
         self.keywords = keywords
 
+
 class Videos:
     def __init__(self, videos):
         self.videos = videos
+
+
+class ThreadInfo:
+    def __init__(self):
+        self.is_killed = False
+
 
 class Model:
     nltk.download('stopwords')
@@ -105,8 +112,7 @@ class Model:
             return word_found, value
 
     def __lemmatize(self, text):
-        return [self.__morphy.parse(lemma)[0].normal_form for lemma
-                in self.__decode_text(text).split()]
+        return [self.__morphy.parse(lemma)[0].normal_form for lemma in text.split()]
 
     def __is_good_word(self, word):
         word_analysis = self.__morphy.parse(word)[0]

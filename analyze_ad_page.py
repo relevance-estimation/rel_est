@@ -5,10 +5,9 @@ import sys
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout,
                             QPushButton, QLabel, QHBoxLayout, QSizePolicy, QLineEdit, QTextEdit, QFileDialog,
                             QMessageBox, QListWidget)
-from PyQt5.QtCore import QRect, Qt
+from PyQt5.QtCore import QRect, Qt, QObject, QThread, pyqtSignal, QRunnable, QThreadPool
 from PyQt5.QtGui import QFont, QTextOption
 from functools import partial
-from PyQt5 import QtCore
 
 import video_relevance
 
@@ -24,6 +23,8 @@ class App(QMainWindow):
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         self.page = AnalyzeAdPage(self)
+        self.model = video_relevance.Model()
+        self.controller = AnalyzeAdPageController(self.page, self.model)
         self.setCentralWidget(self.page)
 
         self.show()
@@ -192,8 +193,9 @@ class AnalyzeAdPage(QWidget):
         return [self.adLinksBlockText.item(i).text() for i in range(self.adLinksBlockText.count())]
 
     def get_keywords(self):
-        keywords = [[token for token in tokens] for tokens in self.adKeywordsBlockText.toPlainText().split('\n')]
-        for i in range(self.adKeywordsBlockText.count(), self.adLinksBlockText.count() + 1):
+        keyword_lines = self.adKeywordsBlockText.toPlainText().split('\n')
+        keywords = [[token for token in tokens] for tokens in keyword_lines]
+        for i in range(len(keywords), self.adLinksBlockText.count() + 1):
             keywords.append([])
         return keywords
 
@@ -225,41 +227,83 @@ class AnalyzeAdPageController:
     def __init__(self, analyze_ad_page: AnalyzeAdPage, model: video_relevance.Model):
         self.analyze_ad_page = analyze_ad_page
         self.model = model
+        self.signals()
 
     def signals(self):
         self.analyze_ad_page.start_analysis_slot(self.start_analysis)
         self.analyze_ad_page.cancel_slot(self.cancel_analysis)
 
-    class Analyzer:
-        def __init__(self, page: AnalyzeAdPage, model: video_relevance.Model, path_list: list,
+    def start_analysis(self):
+        path_list = self.analyze_ad_page.get_paths()
+        keywords_list = self.analyze_ad_page.get_keywords()
+        save_to_path = self.analyze_ad_page.get_save_info_path()
+        pool = QThreadPool.globalInstance()
+
+        self.runnable = self.Analyzer(self.model, path_list,
+                                      keywords_list, save_to_path)
+        self.runnable.signal.progress.connect(self.analyze_ad_page.update_progress)
+        self.runnable.signal.finished.connect(self.analyze_finished)
+        self.runnable.signal.error.connect(self.error)
+        pool.start(self.runnable)
+
+    def cancel_analysis(self):
+        self.runnable.kill()
+        self.analyze_ad_page.cancel_analysis()
+        self.analyze_ad_page.update_progress("Выполнение прервано")
+
+    def analyze_finished(self, msg):
+        self.analyze_ad_page.update_progress(msg)
+        self.analyze_ad_page.cancel_analysis()
+        self.analyze_ad_page.update_progress("Выполнение завершено")
+
+    def error(self, msg):
+        self.analyze_ad_page.show_error(msg)
+        self.analyze_ad_page.cancel_analysis()
+        self.analyze_ad_page.update_progress("Выполнение прервано")
+
+    class Signals(QObject):
+        progress = pyqtSignal(str)
+        finished = pyqtSignal(str)
+        error = pyqtSignal(str)
+
+    class Analyzer(QRunnable):
+        def __init__(self, model: video_relevance.Model, path_list: list,
                      keywords_list: list, save_to_path: str):
-            self.page = page
+            super(AnalyzeAdPageController.Analyzer, self).__init__()
             self.model = model
             self.path_list = path_list
             self.keywords_list = keywords_list
             self.save_to_path = save_to_path
-            self.thread = QtCore.QThread()
-            self.thread.moveToThread(self.start_analysis)
-            self.signals()
+            self.total_num = len(self.path_list)
 
-        def signals(self):
-            self.AnalyzeAdPage.pageDownloadButton(self.thread.start())
-            self.AnalyzeAdPage.pageCancelButton(self.thread.quit())
+            self.is_killed = False
 
+            self.signal = AnalyzeAdPageController.Signals()
 
         def update_progress(self, msg):
-            self.analyze_ad_page.update_progress("{}/{}: {}".format(self.cur_vid_id, self.total_num, msg))
+            self.signal.progress.emit("{}/{}: {}".format(self.cur_vid_id, self.total_num, msg))
 
-        def start_analysis(self):
+        def run(self):
+            print("started")
             for i, info in enumerate(zip(self.path_list, self.keywords_list)):
+                if self.is_killed:
+                    self.signal.finished.emit("Выполнение прервано")
+                    return
+                self.cur_vid_id = i + 1
                 filename = info[0]
                 name = info[0].split("/")[-1]
                 keywords = info[1]
                 try:
+                    print(self.save_to_path + "/" + name)
                     self.model.save_ad_info(filename, self.save_to_path + "/" + name,
                                             keywords, self.update_progress)
                 except Exception as e:
-                    self.page.show_error("Ошибка обработки файла {}: " + str(e))
+                    self.signal.error.emit("Ошибка обработки файла {}: ".format(filename) + str(e))
+                    return
+            self.signal.finished.emit("Выполнение завершено")
+
+        def kill(self):
+            self.is_killed = True
 
 
 if __name__ == '__main__':

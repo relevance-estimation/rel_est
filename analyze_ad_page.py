@@ -130,9 +130,6 @@ class AnalyzeAdPage(QWidget):
         self.adLinksBlockText.itemSelectionChanged.connect(self.analysis_check)
         self.adKeywordsBlockText.textChanged.connect(self.analysis_check)
 
-        self.pageDownloadButton.clicked.connect(self.start_analysis)
-        self.pageCancelButton.clicked.connect(self.cancel_analysis)
-
     def read_file(self, textField):
         select_file = QFileDialog.getOpenFileName(self)
         if select_file[0] != "":
@@ -183,6 +180,9 @@ class AnalyzeAdPage(QWidget):
         self.adKeywordsBlockText.setReadOnly(False)
         self.adLinksBlockText.setEnabled(True)
 
+    def disable_cancel(self):
+        self.pageCancelButton.setEnabled(False)
+
     def start_analysis_slot(self, slot):
         self.pageDownloadButton.clicked.connect(slot)
 
@@ -194,7 +194,7 @@ class AnalyzeAdPage(QWidget):
 
     def get_keywords(self):
         keyword_lines = self.adKeywordsBlockText.toPlainText().split('\n')
-        keywords = [[token for token in tokens] for tokens in keyword_lines]
+        keywords = [[token for token in tokens.split()] for tokens in keyword_lines]
         for i in range(len(keywords), self.adLinksBlockText.count() + 1):
             keywords.append([])
         return keywords
@@ -234,6 +234,7 @@ class AnalyzeAdPageController:
         self.analyze_ad_page.cancel_slot(self.cancel_analysis)
 
     def start_analysis(self):
+        self.analyze_ad_page.start_analysis()
         path_list = self.analyze_ad_page.get_paths()
         keywords_list = self.analyze_ad_page.get_keywords()
         save_to_path = self.analyze_ad_page.get_save_info_path()
@@ -243,18 +244,21 @@ class AnalyzeAdPageController:
                                       keywords_list, save_to_path)
         self.runnable.signal.progress.connect(self.analyze_ad_page.update_progress)
         self.runnable.signal.finished.connect(self.analyze_finished)
+        self.runnable.signal.canceled.connect(self.analyze_canceled)
         self.runnable.signal.error.connect(self.error)
         pool.start(self.runnable)
 
     def cancel_analysis(self):
         self.runnable.kill()
-        self.analyze_ad_page.cancel_analysis()
-        self.analyze_ad_page.update_progress("Выполнение прервано")
+        self.analyze_ad_page.disable_cancel()
 
-    def analyze_finished(self, msg):
-        self.analyze_ad_page.update_progress(msg)
+    def analyze_canceled(self):
+        self.analyze_ad_page.update_progress("Выполнение прервано")
         self.analyze_ad_page.cancel_analysis()
+
+    def analyze_finished(self):
         self.analyze_ad_page.update_progress("Выполнение завершено")
+        self.analyze_ad_page.cancel_analysis()
 
     def error(self, msg):
         self.analyze_ad_page.show_error(msg)
@@ -263,7 +267,8 @@ class AnalyzeAdPageController:
 
     class Signals(QObject):
         progress = pyqtSignal(str)
-        finished = pyqtSignal(str)
+        finished = pyqtSignal()
+        canceled = pyqtSignal()
         error = pyqtSignal(str)
 
     class Analyzer(QRunnable):
@@ -284,10 +289,9 @@ class AnalyzeAdPageController:
             self.signal.progress.emit("{}/{}: {}".format(self.cur_vid_id, self.total_num, msg))
 
         def run(self):
-            print("started")
             for i, info in enumerate(zip(self.path_list, self.keywords_list)):
                 if self.is_killed:
-                    self.signal.finished.emit("Выполнение прервано")
+                    self.signal.canceled.emit()
                     return
                 self.cur_vid_id = i + 1
                 filename = info[0]
@@ -300,7 +304,7 @@ class AnalyzeAdPageController:
                 except Exception as e:
                     self.signal.error.emit("Ошибка обработки файла {}: ".format(filename) + str(e))
                     return
-            self.signal.finished.emit("Выполнение завершено")
+            self.signal.finished.emit()
 
         def kill(self):
             self.is_killed = True
